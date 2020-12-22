@@ -44,6 +44,8 @@ Visual Chess
     * Ex. Knight outpost, X-ray on king, doubled pawns, rook on empty file, etc.
 * Filter the valid moves such that the AI cannot make a move that leaves it in check.
 * Flip the board around after each turn so the top player has an easier time reading the position. (Think about how it actually looks when you're playing a real chess game over the board).
+* Try implementing Quiescence search to mitigate the *horizon effect* and to make more sensible moves. Quiescence search focuses on searching in greater depths for move trees that are logical and advantageous, while realising very early on if a particular move tree is losing and if so will skip it (similar to how a human would play).
+  * The horizon effect is a problem that can occur when every branch (move tree) is searched to a fixed depth. Dangerous threats and positional weaknesses beyond the fixed depth will not be detected and the AI will not realize the mistakes that it made until it is too late. 
 
 **Known Bugs**
   * Chess AI can sometimes make a move while in check that does not result in it escaping check (illegal move). (This does not happen in local multiplayer)
@@ -70,13 +72,13 @@ Visual Chess
 **Extra Information**
 
 My Favorite Feature:
-* You are able to turn on a visualizer to see the AI calculating its move in real time. This feature will slow the AI down a lot, so it is not recommended to play a full game with this feature on, but rather to learn how the minimax algorithm works.
+* You are able to turn on a visualizer to see the AI calculating its move in real time. This feature will slow the AI down a lot, so it is not recommended to play a full game with this feature on, it should be used to visually learn how the minimax algorithm works.
 
 The chess AI can hold its own in most situations, but has no grasp of positional concepts or mid to late game tactics/evaluations. The strength of my AI depends on the strength and complexity of my evaluation function, which is currently a very simple evaluation. It calculates the material still left on the board (pieces), and then calculates the relative strength of each individual piece based on its position on the board using piece square tables.
 * To learn more, visit https://www.chessprogramming.org/Simplified_Evaluation_Function
 
 How the Minimax Algorithm Works:
-* As you increase the depth, the AI will play better, at the cost of taking exponentially more time to calculate its best move.
+* In zero-sum games such as chess and checkers where one player winning means that the other player has to lose, the minimax algorithm can be used to create an AI. The minimax algorithm calculates the relative strength of each player on the board and returns a number based on its evaluation function. The min player (black in chess), makes moves that will make the evaluation of the current board as small as possible, and the max player (white in chess) will make moves that make the evaluation of the current board as big as possible. As you increase the depth, the AI will play better, at the cost of taking exponentially more time to calculate its best move.
 * At a depth of 1, the AI will only calculate the move that immediately betters its current position without thinking about the future repurcussions of its move. This means that if the AI is given an opportunity to take a piece, it always will. (The AI will prioritize pieces with higher values, ex. Capturing Queen > Capturing Knight) 
 * At a depth of 2, the AI will calculate its current best move, along with calculating your best move if they make that particular move. Calculating the strength of the moves is where the minimax algorithm comes in. It tries to minimize the strength of your best response, while also maximizing the strength of its move.
 * At a depth of 3, the AI is able to calculate its position after its current best move, calculate the position after your best move in response, and then assuming you make the best possible move (up to the standards of the eval function), it can also calculate its next best move and position.
