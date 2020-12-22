@@ -40,7 +40,7 @@ Visual Chess
 * Update Chess Notation 
   * If two or more identical pieces can move to the same square, need to write which one is moving
 * Update Evaluations
-  * Improving the Evaluation function will improve the effictiveness of the alpha-beta pruning, and will give better moves.
+  * Improving the Evaluation function will improve the effectiveness of the alpha-beta pruning, and will give better moves.
     * Ex. Knight outpost, X-ray on king, doubled pawns, rook on empty file, etc.
 * Filter the valid moves such that the AI cannot make a move that leaves it in check.
 * Flip the board around after each turn so the top player has an easier time reading the position. (Think about how it actually looks when you're playing a real chess game over the board).
@@ -60,6 +60,7 @@ Visual Chess
 * To clone repository, press the green "Code" button, and copy the HTTPS to your clipboard.
 * Create a new project in your code editor or IDE of choice.
 * Import the HTTPS url into version control on your new project.
+* Two Examples:
   * If using pycharm, go to VCS --> get from version control --> paste the url --> clone
   * If using Visual Studio Code, go to explorer (ctrl + shift + e) --> clone repository --> paste the url --> clone
 
