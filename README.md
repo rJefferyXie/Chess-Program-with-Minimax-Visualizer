@@ -1,4 +1,5 @@
 **Name**
+
 Visual Chess 
 
 **General Features**
@@ -66,6 +67,7 @@ Visual Chess
 * Running the chess.py file will start the program!
 
 **Extra Information**
+
 My Favorite Feature:
 * You are able to turn on a visualizer to see the AI calculating its move in real time. This feature will slow the AI down a lot, so it is not recommended to play a full game with this feature on, but rather to learn how the minimax algorithm works.
 
