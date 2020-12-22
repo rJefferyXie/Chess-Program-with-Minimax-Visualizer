@@ -18,7 +18,7 @@ class Material(object):
         self.captured_black_pieces = []
         self.captured_white_pieces = []
 
-    def draw_captured(self, window):
+    def draw_captured(self, window, color):
         # Draw captured black pieces
         for piece in range(len(self.captured_black_pieces)):
             if isinstance(self.captured_black_pieces[piece], Pawn):
@@ -31,10 +31,16 @@ class Material(object):
                 image = pygame.transform.scale(rooks[1], (32, 32))
             else:
                 image = pygame.transform.scale(queens[1], (32, 32))
-            if piece < 8:
-                window.blit(image, (480 + piece * 25, 400))
+            if color == "White":
+                if piece < 8:
+                    window.blit(image, (480 + piece * 25, 400))
+                else:
+                    window.blit(image, (480 + (piece - 8) * 25, 425))
             else:
-                window.blit(image, (480 + (piece - 8) * 25, 425))
+                if piece < 8:
+                    window.blit(image, (480 + piece * 25, 25))
+                else:
+                    window.blit(image, (480 + (piece - 8) * 25, 45))
 
         # Draw captured white pieces
         for piece in range(len(self.captured_white_pieces)):
@@ -48,21 +54,33 @@ class Material(object):
                 image = pygame.transform.scale(rooks[0], (32, 32))
             else:
                 image = pygame.transform.scale(queens[0], (32, 32))
-            if piece < 8:
-                window.blit(image, (480 + piece * 25, 25))
+            if color == "White":
+                if piece < 8:
+                    window.blit(image, (480 + piece * 25, 25))
+                else:
+                    window.blit(image, (480 + (piece - 8) * 25, 45))
             else:
-                window.blit(image, (480 + (piece - 8) * 25, 45))
+                if piece < 8:
+                    window.blit(image, (480 + piece * 25, 400))
+                else:
+                    window.blit(image, (480 + (piece - 8) * 25, 425))
 
-    def draw_advantages(self, window):
+    def draw_advantages(self, window, color):
         if self.white_advantage > self.black_advantage:
             text = my_font.render("+" + str(self.white_advantage), False, (0, 0, 0))
             self.captured_black_pieces.append(text)
             for piece in range(len(self.captured_black_pieces)):
                 if not isinstance(self.captured_black_pieces[piece], (Pawn, Knight, Bishop, Rook, Queen)):
-                    if piece < 8:
-                        window.blit(self.captured_black_pieces[piece], (460 + (piece + 1) * 25, 410))
+                    if color == "White":
+                        if piece < 8:
+                            window.blit(self.captured_black_pieces[piece], (460 + (piece + 1) * 25, 410))
+                        else:
+                            window.blit(self.captured_black_pieces[piece], (460 + (piece - 7) * 25, 435))
                     else:
-                        window.blit(self.captured_black_pieces[piece], (460 + (piece - 7) * 25, 435))
+                        if piece < 8:
+                            window.blit(self.captured_black_pieces[piece], (460 + (piece + 1) * 25, 35))
+                        else:
+                            window.blit(self.captured_black_pieces[piece], (460 + (piece - 7) * 25, 60))
                     self.captured_black_pieces.pop(-1)
 
         elif self.black_advantage > self.white_advantage:
@@ -70,10 +88,16 @@ class Material(object):
             self.captured_white_pieces.append(text)
             for piece in range(len(self.captured_white_pieces)):
                 if not isinstance(self.captured_white_pieces[piece], (Pawn, Knight, Bishop, Rook, Queen)):
-                    if piece < 8:
-                        window.blit(self.captured_white_pieces[piece], (460 + (piece + 1) * 25, 35))
+                    if color == "White":
+                        if piece < 8:
+                            window.blit(self.captured_white_pieces[piece], (460 + (piece + 1) * 25, 35))
+                        else:
+                            window.blit(self.captured_white_pieces[piece], (460 + (piece - 7) * 25, 60))
                     else:
-                        window.blit(self.captured_white_pieces[piece], (460 + (piece - 7) * 25, 60))
+                        if piece < 8:
+                            window.blit(self.captured_white_pieces[piece], (460 + (piece + 1) * 25, 410))
+                        else:
+                            window.blit(self.captured_white_pieces[piece], (460 + (piece - 7) * 25, 435))
                     self.captured_white_pieces.pop(-1)
 
     def update_advantages(self, board):

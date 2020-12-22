@@ -32,7 +32,7 @@ class MoveHistory(object):
     def draw_move_log(self, window):
         if 0 < len(self.move_log) < 50:
             self.show_move_log(0, window)
-        elif 50 < len(self.move_log) < 100:
+        elif 50 <= len(self.move_log) < 100:
             self.show_move_log(50, window)
 
     def show_move_log(self, start, window):

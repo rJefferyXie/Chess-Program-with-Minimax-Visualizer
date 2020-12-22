@@ -50,8 +50,8 @@ class Game(object):
         self.board.draw_theme_window(self.window)
         self.board.draw_game_buttons(self.window)
         self.move_history.draw_move_log(self.window)
-        self.board.material.draw_captured(self.window)
-        self.board.material.draw_advantages(self.window)
+        self.board.material.draw_captured(self.window, self.human.color)
+        self.board.material.draw_advantages(self.window, self.human.color)
         self.board.draw(self.window, board)
         if self.human.promoting:
             self.board.promotion_menu(self.human.color, self.window)
@@ -175,7 +175,7 @@ class Game(object):
     def no_captures_in_50(self):
         if len(self.move_history.move_log) > 50:
             moves = self.move_history.move_log[-50:]
-            captures = [move for move in moves if "x" in moves]
+            captures = [move for move in moves if "x" in move]
             if len(captures) == 0:
                 self.no_captures_50 = True
 

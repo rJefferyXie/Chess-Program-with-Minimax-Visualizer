@@ -106,12 +106,14 @@ class SinglePlayer(object):
     def play(self):
         if self.color != "" and self.difficulty != "PY_VAR0":
             difficulty = self.difficulty.get()
-            self.root.destroy()
             if "Easy" in difficulty:
+                self.root.destroy()
                 single_player_game(self.color, 0, 2)
             elif "Medium" in difficulty:
+                self.root.destroy()
                 single_player_game(self.color, 0, 3)
-            else:
+            elif "Hard" in difficulty:
+                self.root.destroy()
                 single_player_game(self.color, 0, 4)
 
 
