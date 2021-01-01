@@ -1,6 +1,4 @@
-**Name**
-
-Visual Chess 
+# Visual Chess by Jeffery Xie
 
 **General Features**
 * Local Multiplayer
