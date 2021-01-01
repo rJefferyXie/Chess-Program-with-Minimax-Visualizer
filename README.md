@@ -1,7 +1,16 @@
 # Visual Chess by Jeffery Xie
 A functional chess game implemented in python, with pygame as a supporting module. This program includes local multiplayer and single player vs an AI, which uses the minimax algorithm to determine its moves. A special feature of this program is the "visual" aspect where the user can toggle a setting that allows them to see which moves the computer is currently considering in real time.
 
-# Requirements and Installation
+# Table of Contents
+* [Requirements and Installation](#req)
+* [Notes to User](#notes)
+* [Features](#features)
+* [Implemented Game Mechanics](#mechanics)
+* [Future Implementations](#future)
+* [Known Bugs](#bugs)
+* [Extra Information](#extra)
+
+# Requirements and Installation <a name="req"></a>
 **Required Modules**
 
 To install, simply enter these commands into your terminal. (for macOS users, replace pip with pip3)
@@ -20,7 +29,7 @@ To install, simply enter these commands into your terminal. (for macOS users, re
 **Running**
 * Running the chess.py file will start the program!
 
-# Special Notes to User
+# Notes to User <a name="notes"></a>
 * **AI Difficulties Guidelines**
   * Note that the time in between moves depends on search depth, along with the number of valid moves that the AI has.
   * Easy (Depth 2) will think for about 5-10 seconds on its moves.
@@ -29,7 +38,7 @@ To install, simply enter these commands into your terminal. (for macOS users, re
 * If you are playing against the AI, try not to click anything unless it is your turn.
     * Clicking on the screen while the AI is thinking will cause the window to freeze until it is done thinking.
 
-# Features
+# Features <a name="features"></a>
 * Local Multiplayer
 * Single Player vs AI
   * AI implements the minimax algorithm to determine its moves.
@@ -42,7 +51,7 @@ To install, simply enter these commands into your terminal. (for macOS users, re
 * Variety of chess board themes to choose from.
 * Material tracker that displays captured pieces and advantages.
   
-# Implemented Game Mechanics
+# Implemented Game Mechanics <a name="mechanics"></a>
 * Checkmate Detection.
 * Long and Short Side Castling.
     * Detects if enemy has any pieces looking at the castling path!
@@ -54,7 +63,7 @@ To install, simply enter these commands into your terminal. (for macOS users, re
 * Draw by insufficient material.
 * Draw by 50 moves no captures.
 
-# Future Implementations
+# Future Implementations <a name="future"></a>
 * Update Chess Notation 
   * If two or more identical pieces can move to the same square, need to write which one is moving
 * Update Evaluations
@@ -65,10 +74,10 @@ To install, simply enter these commands into your terminal. (for macOS users, re
 * Try implementing Quiescence search to mitigate the *horizon effect* and to make more sensible moves. Quiescence search focuses on searching in greater depths for move trees that are logical and advantageous, while realising very early on if a particular move tree is losing and if so will skip it (similar to how a human would play).
   * The horizon effect is a problem that can occur when every branch (move tree) is searched to a fixed depth. Dangerous threats and positional weaknesses beyond the fixed depth will not be detected and the AI will not realize the mistakes that it made until it is too late. 
 
-# Known Bugs
+# Known Bugs <a name="bugs"></a>
   * Chess AI can sometimes make a move while in check that does not result in it escaping check (illegal move). (This does not happen in local multiplayer)
 
-# Extra Information
+# Extra Information <a name="extra"></a>
 The chess AI can hold its own in most situations, but has no grasp of positional concepts or mid to late game tactics/evaluations. The strength of my AI depends on the strength and complexity of my evaluation function, which is currently a very simple evaluation. It calculates the material still left on the board (pieces), and then calculates the relative strength of each individual piece based on its position on the board using piece square tables.
 * To learn more, visit https://www.chessprogramming.org/Simplified_Evaluation_Function
 
