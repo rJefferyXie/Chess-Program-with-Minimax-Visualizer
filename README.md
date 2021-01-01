@@ -1,6 +1,34 @@
 # Visual Chess by Jeffery Xie
+A functional chess game implemented in python, with Pygame as a supporting module. This program includes local multiplayer and single player vs an AI, which uses the minimax algorithm to determine its moves.
 
-# General Features
+# Requirements and Installation
+**Required Modules**
+* A list of all required modules. To install, simply enter these commands into your terminal. (for macOS users, replace pip with pip3)
+* pip install pygame
+  * If the command above does not work, visit https://www.pygame.org/wiki/GettingStarted for help.
+* pip install tkinter
+
+**Setting up Repository**
+* To clone repository, press the green "Code" button, and copy the HTTPS to your clipboard.
+* Create a new project in your code editor or IDE of choice.
+* Import the HTTPS url into version control on your new project.
+* Two Examples:
+  * If using pycharm, go to VCS --> get from version control --> paste the url --> clone
+  * If using Visual Studio Code, go to explorer (ctrl + shift + e) --> clone repository --> paste the url --> clone
+
+**Running**
+* Running the chess.py file will start the program!
+
+# Special Notes to User
+* **AI Difficulties Guidelines**
+  * Note that the time in between moves depends on search depth, along with the number of valid moves that the AI has.
+  * Easy (Depth 2) will think for about 5-10 seconds on its moves.
+  * Medium (Depth 3) will think for about 20-40 seconds on its moves.
+  * Hard (Depth 4) will think for about 60-120 seconds on its moves.
+* If you are playing against the AI, try not to click anything unless it is your turn.
+    * Clicking on the screen while the AI is thinking will cause the window to freeze until it is done thinking.
+
+# Features
 * Local Multiplayer
 * Single Player vs AI
   * AI implements the minimax algorithm to determine its moves.
@@ -24,33 +52,6 @@
 * Draw by stalemate (no valid moves remaining).
 * Draw by insufficient material.
 * Draw by 50 moves no captures.
-
-# Special Notes to User
-* **AI Difficulties Guidelines**
-  * Note that the time in between moves depends on search depth, along with the number of valid moves that the AI has.
-  * Easy (Depth 2) will think for about 5-10 seconds on its moves.
-  * Medium (Depth 3) will think for about 20-40 seconds on its moves.
-  * Hard (Depth 4) will think for about 60-120 seconds on its moves.
-* If you are playing against the AI, try not to click anything unless it is your turn.
-    * Clicking on the screen while the AI is thinking will cause the window to freeze until it is done thinking.
-
-# Requirements and Installation
-**Required Modules**
-* A list of all required modules. To install, simply enter these commands into your terminal. (for macOS users, replace pip with pip3)
-* pip install pygame
-  * If the command above does not work, visit https://www.pygame.org/wiki/GettingStarted for help.
-* pip install tkinter
-
-**Setting up Repository**
-* To clone repository, press the green "Code" button, and copy the HTTPS to your clipboard.
-* Create a new project in your code editor or IDE of choice.
-* Import the HTTPS url into version control on your new project.
-* Two Examples:
-  * If using pycharm, go to VCS --> get from version control --> paste the url --> clone
-  * If using Visual Studio Code, go to explorer (ctrl + shift + e) --> clone repository --> paste the url --> clone
-
-**Running**
-* Running the chess.py file will start the program!
 
 # Future Implementations
 * Update Chess Notation 
