@@ -11,9 +11,12 @@ A functional chess game implemented in python, with pygame as a supporting modul
 * [Extra Information](#extra)
 
 # Requirements and Installation <a name="req"></a>
+Make sure you have a python version of 3.x or higher!
+
 **Required Modules**
 
 To install, simply enter these commands into your terminal. (for macOS users, replace pip with pip3)
+* For help with installing pip: visit https://pip.pypa.io/en/stable/installing/
 * *pip install pygame*
   * If the command above does not work, visit https://www.pygame.org/wiki/GettingStarted for help.
 * *pip install tkinter*
