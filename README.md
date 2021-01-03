@@ -30,6 +30,7 @@ To install, simply enter these commands into your terminal. (for macOS users, re
 * Running the chess.py file will start the program!
 
 # Notes to User <a name="notes"></a>
+* Pygame's graphics are going to be different depending on the machine that you are using. On Mac for example, things might look more blurry / pixelated.
 * **AI Difficulties Guidelines**
   * Note that the time in between moves depends on search depth, along with the number of valid moves that the AI has.
   * Easy (Depth 2) will think for about 5-10 seconds on its moves.
