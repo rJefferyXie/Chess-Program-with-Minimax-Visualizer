@@ -22,13 +22,17 @@ class Computer(object):
             best_position = None
             for position in self.get_all_positions(board, game, "White"):
                 current_evaluation = self.minimax(position, game, depth - 1, alpha, beta, "Black")[0]
+
                 # If the current move was the best one so far, update best_position
                 if current_evaluation > max_evaluation:
                     best_position = position
                     max_evaluation = current_evaluation
+
+                # Update alpha
                 alpha = max(alpha, max_evaluation)
                 if beta <= alpha:
                     return max_evaluation, best_position
+
             return max_evaluation, best_position
 
         else:
@@ -36,40 +40,55 @@ class Computer(object):
             best_position = None
             for position in self.get_all_positions(board, game, "Black"):
                 current_evaluation = self.minimax(position, game, depth - 1, alpha, beta, "White")[0]
+
                 # If the current move was the best one so far, update best_position
                 if current_evaluation < min_evaluation:
                     best_position = position
                     min_evaluation = current_evaluation
+                
+                # Update beta
                 beta = min(beta, current_evaluation)
                 if beta <= alpha:
                     return min_evaluation, best_position
+
             return min_evaluation, best_position
 
     def get_piece_eval(self, piece):
         if piece.color == "White":
             if isinstance(piece, Pawn):
                 return 100 + pawn_tables[0][piece.col][piece.row]
+
             elif isinstance(piece, Knight):
                 return 320 + knight_tables[0][piece.col][piece.row]
+
             elif isinstance(piece, Bishop):
                 return 330 + bishop_tables[0][piece.col][piece.row]
+
             elif isinstance(piece, Rook):
                 return 500 + rook_tables[0][piece.col][piece.row]
+
             elif isinstance(piece, Queen):
                 return 900 + queen_tables[0][piece.col][piece.row]
+
             elif isinstance(piece, King):
                 return 20000 + king_tables[0][piece.col][piece.row]
+
         else:
             if isinstance(piece, Pawn):
                 return 100 + pawn_tables[1][piece.col][piece.row]
+
             elif isinstance(piece, Knight):
                 return 320 + knight_tables[1][piece.col][piece.row]
+
             elif isinstance(piece, Bishop):
                 return 330 + bishop_tables[1][piece.col][piece.row]
+
             elif isinstance(piece, Rook):
                 return 500 + rook_tables[1][piece.col][piece.row]
+
             elif isinstance(piece, Queen):
                 return 900 + queen_tables[1][piece.col][piece.row]
+
             elif isinstance(piece, King):
                 return 20000 + king_tables[1][piece.col][piece.row]
 
@@ -86,21 +105,25 @@ class Computer(object):
         return position_eval
 
     def get_all_positions(self, board, game, color):
-        moves = []
+        boards = []
+
+        # Get every piece on the board that is the same color as the current player's team, and update valid moves
         for piece in board.get_all_pieces(color):
             if isinstance(piece, Pawn):
                 valid_moves = piece.update_valid_moves(board.board, game.move_history.move_log)
             else:
                 valid_moves = piece.update_valid_moves(board.board)
+            
+            # Simulate each move and add the new board to boards
             for move in valid_moves:
                 temp_board = deepcopy(board)
                 temp_piece = temp_board.get_piece(piece.row, piece.col)
                 new_temp_board = self.simulate_move(temp_piece, temp_board, game, move, color)
                 if game.show_AI_calculations:
                     self.draw_moves(piece, game, new_temp_board)
-                moves.append(new_temp_board)
+                boards.append(new_temp_board)
 
-        return moves
+        return boards
 
     def simulate_move(self, piece, board, game, move, color):
         target = board.get_piece(move[0], move[1])
@@ -110,6 +133,7 @@ class Computer(object):
         board.target = (move[0], move[1])
         board.captured_piece = target
 
+        # Castling
         if isinstance(piece, King) and isinstance(target, Rook) and piece.color == target.color:
             dangerous_squares = game.get_dangerous_squares()
             game.castle(piece, target, move[0], move[1], dangerous_squares, board)

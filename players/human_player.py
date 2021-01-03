@@ -11,8 +11,8 @@ class Human(object):
         self.color = color
         self.game = game
         self.selected_piece = None
-        self.valid_moves = []
         self.promoting = False
+        self.valid_moves = []
 
     def select(self, row, col, mouse_xy):
         if row < 8 and col < 8 and not self.promoting:
@@ -32,28 +32,37 @@ class Human(object):
         if self.promoting:
             if (row, col) == (9, 3):
                 self.promote(Queen, self.selected_piece.row, self.selected_piece.col)
+
             elif (row, col) == (10, 3):
                 self.promote(Rook, self.selected_piece.row, self.selected_piece.col)
+
             elif (row, col) == (9, 4):
                 self.promote(Bishop, self.selected_piece.row, self.selected_piece.col)
+
             elif (row, col) == (10, 4):
                 self.promote(Knight, self.selected_piece.row, self.selected_piece.col)
 
         # Changing Theme
         if 500 < mouse_xy[0] < 560 and 115 < mouse_xy[1] < 175:
             self.game.theme = 0
+
         elif 570 < mouse_xy[0] < 630 and 115 < mouse_xy[1] < 175:
             self.game.theme = 1
+
         elif 640 < mouse_xy[0] < 700 and 115 < mouse_xy[1] < 175:
             self.game.theme = 2
+
 
         # Clicking on Game Buttons
         if 485 < mouse_xy[0] < 555 and 330 < mouse_xy[1] < 365:
             self.game.resign = True
+            
         elif 565 < mouse_xy[0] < 635 and 330 < mouse_xy[1] < 365:
             self.game.show_AI_calculations = not self.game.show_AI_calculations
+
         elif 645 < mouse_xy[0] < 715 and 330 < mouse_xy[1] < 365:
             self.game.show_valid_moves = not self.game.show_valid_moves
+
         return False
 
     def move(self, row, col):
@@ -66,8 +75,7 @@ class Human(object):
             return False
 
         # Player is trying to castle
-        if isinstance(self.selected_piece, King) and isinstance(piece, Rook) \
-                and self.selected_piece.color == piece.color and (row, col) in self.valid_moves:
+        if isinstance(self.selected_piece, King) and isinstance(piece, Rook) and self.selected_piece.color == piece.color and (row, col) in self.valid_moves:
             dangerous_squares = self.game.get_dangerous_squares()
             if self.game.castle(self.selected_piece, piece, row, col, dangerous_squares, self.game.board):
                 move_str = self.game.board.move_notation
@@ -90,14 +98,16 @@ class Human(object):
             else:
                 if isinstance(self.selected_piece, (Rook, King)):
                     self.selected_piece.can_castle = False
+
                 if isinstance(self.selected_piece, (Knight, Bishop, Rook, Queen, King)):
                     move_str = self.selected_piece.letter + "x" + \
                                self.game.move_history.get_file(row) + str(abs(8 - col))
+
                 elif isinstance(self.selected_piece, Pawn):
                     if abs(self.selected_piece.col - prev_col) <= 1:
                         self.selected_piece.vulnerable_to_en_passant = False
-                    move_str = self.game.move_history.get_file(prev_row) + "x" + \
-                        self.game.move_history.get_file(row) + str(abs(8 - col))
+
+                    move_str = self.game.move_history.get_file(prev_row) + "x" + self.game.move_history.get_file(row) + str(abs(8 - col))
                     if self.game.detect_promotion(self.selected_piece):
                         self.promoting = True
 
@@ -122,6 +132,7 @@ class Human(object):
                     # If a king or a rook moves before castling, it can no longer castle
                     if isinstance(self.selected_piece, (Rook, King)):
                         self.selected_piece.can_castle = False
+                        
                 elif isinstance(self.selected_piece, Pawn):
                     # If a pawn only moves 1 square, it is not vulnerable to en passant
                     if abs(self.selected_piece.col - prev_col) <= 1:
@@ -134,14 +145,17 @@ class Human(object):
                             self.game.board.board[self.selected_piece.row][self.selected_piece.col + 1] = 0
                             self.game.capture(piece)
                             move_str = self.game.move_history.get_file(row) + "x" + str(abs(8 - col))
+
                         else:
                             move_str = self.game.move_history.get_file(row) + str(abs(8 - col))
+
                     else:
                         piece = self.game.board.board[self.selected_piece.row][self.selected_piece.col - 1]
                         if isinstance(piece, Pawn):
                             self.game.board.board[self.selected_piece.row][self.selected_piece.col - 1] = 0
                             self.game.capture(piece)
                             move_str = self.game.move_history.get_file(row) + "x" + str(abs(8 - col))
+
                         else:
                             move_str = self.game.move_history.get_file(row) + str(abs(8 - col))
 

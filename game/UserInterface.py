@@ -71,23 +71,20 @@ class SinglePlayer(object):
 
         difficulties = [("Easy", "Depth: 2"), ("Medium", "Depth: 3"), ("Hard", "Depth: 4")]
         difficulty_selection = tk.OptionMenu(self.root, self.difficulty, *difficulties)
-
         difficulty_selection.place(x=130, y=140, height=32, width=140)
+
         if self.color == "":
-            white_king = tk.Button(self.root, bg="lightskyblue", image=self.white_king_image,
-                                   command=lambda color="White": self.select_color(color))
-            black_king = tk.Button(self.root, bg="lightskyblue", image=self.black_king_image,
-                                   command=lambda color="Black": self.select_color(color))
+            white_king = tk.Button(self.root, bg="lightskyblue", image=self.white_king_image, command=lambda color="White": self.select_color(color))
+            black_king = tk.Button(self.root, bg="lightskyblue", image=self.black_king_image, command=lambda color="Black": self.select_color(color))
+
         elif self.color == "White":
-            white_king = tk.Button(self.root, bg="salmon", image=self.white_king_image,
-                                   command=lambda color="White": self.select_color(color))
-            black_king = tk.Button(self.root, bg="lightskyblue", image=self.black_king_image,
-                                   command=lambda color="Black": self.select_color(color))
+            white_king = tk.Button(self.root, bg="salmon", image=self.white_king_image, command=lambda color="White": self.select_color(color))
+            black_king = tk.Button(self.root, bg="lightskyblue", image=self.black_king_image, command=lambda color="Black": self.select_color(color))
+
         else:
-            white_king = tk.Button(self.root, bg="lightskyblue", image=self.white_king_image,
-                                   command=lambda color="White": self.select_color(color))
-            black_king = tk.Button(self.root, bg="salmon", image=self.black_king_image,
-                                   command=lambda color="Black": self.select_color(color))
+            white_king = tk.Button(self.root, bg="lightskyblue", image=self.white_king_image, command=lambda color="White": self.select_color(color))
+            black_king = tk.Button(self.root, bg="salmon", image=self.black_king_image, command=lambda color="Black": self.select_color(color))
+
         white_king.place(x=60, y=140, height=64, width=64)
         black_king.place(x=275, y=140, height=64, width=64)
 
@@ -106,12 +103,15 @@ class SinglePlayer(object):
     def play(self):
         if self.color != "" and self.difficulty != "PY_VAR0":
             difficulty = self.difficulty.get()
+
             if "Easy" in difficulty:
                 self.root.destroy()
                 single_player_game(self.color, 0, 2)
+
             elif "Medium" in difficulty:
                 self.root.destroy()
                 single_player_game(self.color, 0, 3)
+                
             elif "Hard" in difficulty:
                 self.root.destroy()
                 single_player_game(self.color, 0, 4)
@@ -241,20 +241,20 @@ def single_player_game(color, theme, depth):
 def draw_end_screen(chess_game, game_window):
     if chess_game.checkmate_win:
         if chess_game.turn == "White":
-            main_text = my_font.render("Black won by checkmate.", False, themes[chess_game.theme][0])
+            main_text = my_font.render("Black won by checkmate.", True, themes[chess_game.theme][0])
         else:
-            main_text = my_font.render("White won by checkmate.", False, themes[chess_game.theme][0])
+            main_text = my_font.render("White won by checkmate.", True, themes[chess_game.theme][0])
     elif chess_game.stalemate_draw:
         if chess_game.turn == "Black":
-            main_text = my_font.render("Stalemate. Black has no moves.", False, themes[chess_game.theme][0])
+            main_text = my_font.render("Stalemate. Black has no moves.", True, themes[chess_game.theme][0])
         else:
-            main_text = my_font.render("Stalemate. White has no moves.", False, themes[chess_game.theme][0])
+            main_text = my_font.render("Stalemate. White has no moves.", True, themes[chess_game.theme][0])
     elif chess_game.threefold_draw:
-        main_text = my_font.render("Draw by threefold repetition.", False, themes[chess_game.theme][0])
+        main_text = my_font.render("Draw by threefold repetition.", True, themes[chess_game.theme][0])
     elif chess_game.resign:
-        main_text = my_font.render(chess_game.turn + " has resigned the game.", False, themes[chess_game.theme][0])
+        main_text = my_font.render(chess_game.turn + " has resigned the game.", True, themes[chess_game.theme][0])
     else:
-        main_text = my_font.render("Draw by insufficient material.", False, themes[chess_game.theme][0])
+        main_text = my_font.render("Draw by insufficient material.", True, themes[chess_game.theme][0])
 
     # The main box, border, and text
     pygame.draw.rect(game_window, [0, 0, 0], (85, 160, 310, 160))
@@ -264,13 +264,13 @@ def draw_end_screen(chess_game, game_window):
     # Play again button
     pygame.draw.rect(game_window, [255, 255, 255], (115, 215, 110, 60))
     pygame.draw.rect(game_window, themes[chess_game.theme][1], (120, 220, 100, 50))
-    play_again_text = my_font.render("Play Again", False, [0, 0, 0])
+    play_again_text = my_font.render("Play Again", True, [0, 0, 0])
     game_window.blit(play_again_text, (135, 235))
 
     # Quit button
     pygame.draw.rect(game_window, [255, 255, 255], (245, 215, 110, 60))
     pygame.draw.rect(game_window, themes[chess_game.theme][1], (250, 220, 100, 50))
-    quit_text = my_font.render("Quit", False, [0, 0, 0])
+    quit_text = my_font.render("Quit", True, [0, 0, 0])
     game_window.blit(quit_text, (285, 235))
 
     pygame.display.update()

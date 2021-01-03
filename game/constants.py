@@ -12,7 +12,6 @@ square_size = 640 // 8 - 20
 # Possible themes for the chess board
 blue_theme = (204, 229, 255), (153, 204, 255)
 red_theme = (255, 153, 153), (255, 204, 204)
-pink_theme = (255, 204, 229), (255, 153, 204)
 purple_theme = (229, 204, 255), (204, 153, 255)
 themes = [blue_theme, purple_theme, red_theme]
 
