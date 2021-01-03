@@ -1,4 +1,4 @@
-# Visual Chess by Jeffery Xie
+# Chess-Program-with-Minimax-Visualizer by Jeffery Xie
 A functional chess game implemented in python, with pygame as a supporting module. This program includes local multiplayer and single player vs an AI, which uses the minimax algorithm to determine its moves. A special feature of this program is the "visual" aspect where the user can toggle a setting that allows them to see which moves the computer is currently considering in real time.
 
 # Table of Contents
