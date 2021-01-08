@@ -58,6 +58,8 @@ To install, simply enter these commands into your terminal. (for macOS users, re
     * To optimize the minimax algorithm, I also implemented alpha-beta pruning to cut branches off early when they are worse than a move that has already been seen.
   * The evaluation function for the algorithm is based off of pre-determined piece values and piece square tables (How much a piece is worth, plus the relative strength of the piece in respect to its position on the board).
   * A togglable feature that shows the AI thinking in real time, displaying all board outcomes from the possible moves.
+  * Also includes three speeds for this if the display is moving too fast (slow, medium, fast).
+     * You cannot change this while it is the computers turn! Only on your turn.
 * A move history log with standard chess notation.
 * Tile indicators that show available moves for the piece that you have selected (toggleable).
   * Also shows the previous move that was made.
@@ -89,6 +91,7 @@ To install, simply enter these commands into your terminal. (for macOS users, re
 
 # Known Bugs <a name="bugs"></a>
   * Chess AI can sometimes make a move while in check that does not result in it escaping check (illegal move). (This does not happen in local multiplayer)
+  * The chess AI does not know how to en-passant
 
 # Extra Information <a name="extra"></a>
 The chess AI can hold its own in most situations, but has no grasp of positional concepts or mid to late game tactics/evaluations. The strength of my AI depends on the strength and complexity of my evaluation function, which is currently a very simple evaluation. It calculates the material still left on the board (pieces), and then calculates the relative strength of each individual piece based on its position on the board using piece square tables.
