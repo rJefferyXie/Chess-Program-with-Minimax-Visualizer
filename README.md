@@ -1,6 +1,8 @@
 # Chess Program w/ Minimax Visualizer by Jeffery Xie
 A functional chess game implemented in python, with pygame as a supporting module. This program includes local multiplayer and single player vs an AI, which uses the minimax algorithm to determine its moves. A special feature of this program is the "visual" aspect where the user can toggle a setting that allows them to see which moves the computer is currently considering in real time.
 
+**Please make sure to read the first few lines of the "Extra Information" section!**
+
 # Table of Contents
 * [Requirements and Installation](#req)
 * [Notes to User](#notes)
@@ -82,6 +84,8 @@ To install, simply enter these commands into your terminal. (for macOS users, re
   * Chess AI can sometimes make a move while in check that does not result in it escaping check (illegal move). (This does not happen in local multiplayer)
 
 # Extra Information <a name="extra"></a>
+Note that Pygame's graphics are going to be different depending on the machine / version of machine that you are using. I coded this on a windows machine so things look good for me, but on Mac for example text may be off center and things might look more blurry / pixelated.
+
 The chess AI can hold its own in most situations, but has no grasp of positional concepts or mid to late game tactics/evaluations. The strength of my AI depends on the strength and complexity of my evaluation function, which is currently a very simple evaluation. It calculates the material still left on the board (pieces), and then calculates the relative strength of each individual piece based on its position on the board using piece square tables.
 * To learn more, visit https://www.chessprogramming.org/Simplified_Evaluation_Function
 
