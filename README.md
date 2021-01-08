@@ -58,8 +58,8 @@ To install, simply enter these commands into your terminal. (for macOS users, re
     * To optimize the minimax algorithm, I also implemented alpha-beta pruning to cut branches off early when they are worse than a move that has already been seen.
   * The evaluation function for the algorithm is based off of pre-determined piece values and piece square tables (How much a piece is worth, plus the relative strength of the piece in respect to its position on the board).
   * A togglable feature that shows the AI thinking in real time, displaying all board outcomes from the possible moves.
-  * Also includes three speeds for this if the display is moving too fast (slow, medium, fast).
-     * You cannot change this while it is the computers turn! Only on your turn.
+    * Also includes three speeds for this if the display is moving too fast (slow, medium, fast).
+       * You cannot change this while it is the computers turn! Only on your turn.
 * A move history log with standard chess notation.
 * Tile indicators that show available moves for the piece that you have selected (toggleable).
   * Also shows the previous move that was made.
