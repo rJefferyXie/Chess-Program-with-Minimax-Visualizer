@@ -9,6 +9,7 @@ A functional chess game implemented in python, with pygame as a supporting modul
 * [Features](#features)
 * [Implemented Game Mechanics](#mechanics)
 * [Future Implementations](#future)
+* [Demo Images](#demo)
 * [Known Bugs](#bugs)
 * [Extra Information](#extra)
 
@@ -79,6 +80,12 @@ To install, simply enter these commands into your terminal. (for macOS users, re
 * Flip the board around after each turn so the top player has an easier time reading the position. (Think about how it actually looks when you're playing a real chess game over the board).
 * Try implementing Quiescence search to mitigate the *horizon effect* and to make more sensible moves. Quiescence search focuses on searching in greater depths for move trees that are logical and advantageous, while realising very early on if a particular move tree is losing and if so will skip it (similar to how a human would play).
   * The horizon effect is a problem that can occur when every branch (move tree) is searched to a fixed depth. Dangerous threats and positional weaknesses beyond the fixed depth will not be detected and the AI will not realize the mistakes that it made until it is too late. 
+
+# Demo Images <a name="demo"></a>
+![demo_blue](https://media.discordapp.net/attachments/770779709172613122/797238276128899079/demo_blue.png)
+![demo_purple](https://media.discordapp.net/attachments/770779709172613122/797238282664411147/demo_purple.png)
+![demo_pink](https://media.discordapp.net/attachments/770779709172613122/797238278637879306/demo_pink.png)
+![demo_end](https://media.discordapp.net/attachments/770779709172613122/797238283024990238/demo_resign.png)
 
 # Known Bugs <a name="bugs"></a>
   * Chess AI can sometimes make a move while in check that does not result in it escaping check (illegal move). (This does not happen in local multiplayer)
