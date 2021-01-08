@@ -1,15 +1,15 @@
 # Chess Program w/ Minimax Visualizer by Jeffery Xie
 A functional chess game implemented in python, with pygame as a supporting module. This program includes local multiplayer and single player vs an AI, which uses the minimax algorithm to determine its moves. A special feature of this program is the "visual" aspect where the user can toggle a setting that allows them to see which moves the computer is currently considering in real time.
 
-**Please make sure to read the first few lines of the "Extra Information" section!**
+**Please make sure to read the "Notes to User" section!**
 
 # Table of Contents
 * [Requirements and Installation](#req)
 * [Notes to User](#notes)
+* [Demo Images](#demo)
 * [Features](#features)
 * [Implemented Game Mechanics](#mechanics)
 * [Future Implementations](#future)
-* [Demo Images](#demo)
 * [Known Bugs](#bugs)
 * [Extra Information](#extra)
 
@@ -36,7 +36,7 @@ To install, simply enter these commands into your terminal. (for macOS users, re
 * Running the chess.py file will start the program!
 
 # Notes to User <a name="notes"></a>
-* Pygame's graphics are going to be different depending on the machine that you are using. On Mac for example, things might look more blurry / pixelated.
+* Note that Pygame's graphics are going to be different depending on the machine / version of machine that you are using. I coded this on a windows machine so things look good for me, but on Mac for example text may be off center and things might look more blurry / pixelated.
 * **AI Difficulties Guidelines**
   * Note that the time in between moves depends on search depth, along with the number of valid moves that the AI has.
   * Easy (Depth 2) will think for about 5-10 seconds on its moves.
@@ -44,6 +44,12 @@ To install, simply enter these commands into your terminal. (for macOS users, re
   * Hard (Depth 4) will think for about 60-120 seconds on its moves.
 * If you are playing against the AI, try not to click anything unless it is your turn.
     * Clicking on the screen while the AI is thinking will cause the window to freeze until it is done thinking.
+    
+# Demo Images <a name="demo"></a>
+![demo_blue](https://media.discordapp.net/attachments/770779709172613122/797238276128899079/demo_blue.png)
+![demo_purple](https://media.discordapp.net/attachments/770779709172613122/797238282664411147/demo_purple.png)
+![demo_pink](https://media.discordapp.net/attachments/770779709172613122/797238278637879306/demo_pink.png)
+![demo_end](https://media.discordapp.net/attachments/770779709172613122/797238283024990238/demo_resign.png)
 
 # Features <a name="features"></a>
 * Local Multiplayer
@@ -81,18 +87,10 @@ To install, simply enter these commands into your terminal. (for macOS users, re
 * Try implementing Quiescence search to mitigate the *horizon effect* and to make more sensible moves. Quiescence search focuses on searching in greater depths for move trees that are logical and advantageous, while realising very early on if a particular move tree is losing and if so will skip it (similar to how a human would play).
   * The horizon effect is a problem that can occur when every branch (move tree) is searched to a fixed depth. Dangerous threats and positional weaknesses beyond the fixed depth will not be detected and the AI will not realize the mistakes that it made until it is too late. 
 
-# Demo Images <a name="demo"></a>
-![demo_blue](https://media.discordapp.net/attachments/770779709172613122/797238276128899079/demo_blue.png)
-![demo_purple](https://media.discordapp.net/attachments/770779709172613122/797238282664411147/demo_purple.png)
-![demo_pink](https://media.discordapp.net/attachments/770779709172613122/797238278637879306/demo_pink.png)
-![demo_end](https://media.discordapp.net/attachments/770779709172613122/797238283024990238/demo_resign.png)
-
 # Known Bugs <a name="bugs"></a>
   * Chess AI can sometimes make a move while in check that does not result in it escaping check (illegal move). (This does not happen in local multiplayer)
 
 # Extra Information <a name="extra"></a>
-Note that Pygame's graphics are going to be different depending on the machine / version of machine that you are using. I coded this on a windows machine so things look good for me, but on Mac for example text may be off center and things might look more blurry / pixelated.
-
 The chess AI can hold its own in most situations, but has no grasp of positional concepts or mid to late game tactics/evaluations. The strength of my AI depends on the strength and complexity of my evaluation function, which is currently a very simple evaluation. It calculates the material still left on the board (pieces), and then calculates the relative strength of each individual piece based on its position on the board using piece square tables.
 * To learn more, visit https://www.chessprogramming.org/Simplified_Evaluation_Function
 
