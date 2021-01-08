@@ -8,7 +8,7 @@ import pygame
 
 
 pygame.font.init()
-my_font = pygame.font.SysFont("cambria", 15)
+my_font = pygame.font.SysFont("calibri", 15)
 
 
 class Material(object):
@@ -39,14 +39,14 @@ class Material(object):
 
             if color == "White":
                 if piece < 8:
-                    window.blit(image, (480 + piece * 25, 400))
+                    window.blit(image, (480 + piece * 25, 410))
                 else:
-                    window.blit(image, (480 + (piece - 8) * 25, 425))
+                    window.blit(image, (480 + (piece - 8) * 25, 435))
             else:
                 if piece < 8:
-                    window.blit(image, (480 + piece * 25, 25))
+                    window.blit(image, (480 + piece * 25, 35))
                 else:
-                    window.blit(image, (480 + (piece - 8) * 25, 45))
+                    window.blit(image, (480 + (piece - 8) * 25, 55))
 
         # Draw captured white pieces
         for piece in range(len(self.captured_white_pieces)):
@@ -85,16 +85,16 @@ class Material(object):
                 if not isinstance(self.captured_black_pieces[piece], (Pawn, Knight, Bishop, Rook, Queen)):
                     
                     if color == "White":
-                        if piece < 8:
-                            window.blit(self.captured_black_pieces[piece], (460 + (piece + 1) * 25, 410))
+                        if piece <= 8:
+                            window.blit(self.captured_black_pieces[piece], (460 + (piece + 1) * 25, 420))
                         else:
-                            window.blit(self.captured_black_pieces[piece], (460 + (piece - 7) * 25, 435))
+                            window.blit(self.captured_black_pieces[piece], (460 + (piece - 7) * 25, 445))
                     
                     else:
-                        if piece < 8:
-                            window.blit(self.captured_black_pieces[piece], (460 + (piece + 1) * 25, 35))
+                        if piece <= 8:
+                            window.blit(self.captured_black_pieces[piece], (460 + (piece + 1) * 25, 45))
                         else:
-                            window.blit(self.captured_black_pieces[piece], (460 + (piece - 7) * 25, 60))
+                            window.blit(self.captured_black_pieces[piece], (460 + (piece - 7) * 25, 70))
                     
                     self.captured_black_pieces.pop(-1)
 
@@ -106,13 +106,13 @@ class Material(object):
                 if not isinstance(self.captured_white_pieces[piece], (Pawn, Knight, Bishop, Rook, Queen)):
                     
                     if color == "White":
-                        if piece < 8:
+                        if piece <= 8:
                             window.blit(self.captured_white_pieces[piece], (460 + (piece + 1) * 25, 35))
                         else:
                             window.blit(self.captured_white_pieces[piece], (460 + (piece - 7) * 25, 60))
                     
                     else:
-                        if piece < 8:
+                        if piece <= 8:
                             window.blit(self.captured_white_pieces[piece], (460 + (piece + 1) * 25, 410))
                         else:
                             window.blit(self.captured_white_pieces[piece], (460 + (piece - 7) * 25, 435))

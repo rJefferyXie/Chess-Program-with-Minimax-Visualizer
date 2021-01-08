@@ -5,6 +5,7 @@ from pieces.bishop import Bishop, bishop_tables
 from pieces.rook import Rook, rook_tables
 from pieces.queen import Queen, queen_tables
 from pieces.king import King, king_tables
+import pygame
 
 # Piece Evaluations from https://www.chessprogramming.org/Simplified_Evaluation_Function
 
@@ -119,7 +120,13 @@ class Computer(object):
                 temp_board = deepcopy(board)
                 temp_piece = temp_board.get_piece(piece.row, piece.col)
                 new_temp_board = self.simulate_move(temp_piece, temp_board, game, move, color)
-                if game.show_AI_calculations:
+                
+                if game.board.show_AI_calculations:
+                    if game.board.AI_speed == "Medium":
+                        pygame.time.delay(20)
+                    elif game.board.AI_speed == "Slow":
+                        pygame.time.delay(50)
+
                     self.draw_moves(piece, game, new_temp_board)
                 boards.append(new_temp_board)
 

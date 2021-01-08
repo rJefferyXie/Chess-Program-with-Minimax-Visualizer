@@ -1,7 +1,7 @@
 import pygame
 
 pygame.font.init()
-my_font = pygame.font.SysFont("cambria", 15)
+my_font = pygame.font.SysFont("calibri", 15)
 letters = ["a", "b", "c", "d", "e", "f", "g", "h"]
 
 
@@ -38,7 +38,7 @@ class MoveHistory(object):
 
     def draw_move_log(self, window):
         # Draw First 50 Moves
-        if 0 < len(self.move_log) <= 50:
+        if 0 <= len(self.move_log) < 50:
             self.show_move_log(0, window)
 
         # Draw next 50
@@ -51,24 +51,28 @@ class MoveHistory(object):
 
     def show_move_log(self, start, window):
         move_list = []
-        move_string = ""
+        move_string = []
+        text = my_font.render("".join(move_string), True, (0, 0, 0))
 
         for i in range(start, len(self.move_log)):
             move = str(i + 1) + "." + self.move_log[i] + ", "
-            move_string += move
-            text = my_font.render(move_string, True, (0, 0, 0))
-
-            if len(move_list) == 0:
-                window.blit(text, (10, 490))
-
-            elif len(move_list) > 0:
-                for move_ind in range(len(move_list)):
-                    list_text = my_font.render(move_list[move_ind], True, (0, 0, 0))
-                    window.blit(list_text, (10, 490 + 20 * move_ind))
-
-                window.blit(text, (10, 490 + 20 * len(move_list)))
+            move_string.append(move)
+            text = my_font.render("".join(move_string), True, (0, 0, 0))
 
             # Every 11th move added to move string, append it to move list
             if i != 0 and i % 11 == 0:
-                move_list.append(move_string)
-                move_string = ""
+                move_list.append("".join(move_string))
+                move_string = []
+                text = my_font.render("".join(move_string), True, (0, 0, 0))
+
+        if len(move_list) == 0:
+            window.blit(text, (10, 490))
+
+        elif len(move_list) > 0:
+            for move_ind in range(len(move_list)):
+                list_text = my_font.render(move_list[move_ind], True, (0, 0, 0))
+                window.blit(list_text, (10, 490 + 20 * move_ind))
+
+            window.blit(text, (10, 490 + 20 * len(move_list)))
+
+

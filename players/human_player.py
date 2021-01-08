@@ -52,16 +52,23 @@ class Human(object):
         elif 640 < mouse_xy[0] < 700 and 115 < mouse_xy[1] < 175:
             self.game.theme = 2
 
-
         # Clicking on Game Buttons
         if 485 < mouse_xy[0] < 555 and 330 < mouse_xy[1] < 365:
             self.game.resign = True
             
         elif 565 < mouse_xy[0] < 635 and 330 < mouse_xy[1] < 365:
-            self.game.show_AI_calculations = not self.game.show_AI_calculations
+            self.game.board.show_AI_calculations = not self.game.board.show_AI_calculations
+
+        elif 565 < mouse_xy[0] < 635 and 375 < mouse_xy[1] < 410:
+            if self.game.board.AI_speed == "Fast":
+                self.game.board.AI_speed = "Medium"
+            elif self.game.board.AI_speed == "Medium":
+                self.game.board.AI_speed = "Slow"
+            else:
+                self.game.board.AI_speed = "Fast"
 
         elif 645 < mouse_xy[0] < 715 and 330 < mouse_xy[1] < 365:
-            self.game.show_valid_moves = not self.game.show_valid_moves
+            self.game.board.show_valid_moves = not self.game.board.show_valid_moves
 
         return False
 

@@ -105,16 +105,16 @@ class SinglePlayer(object):
             difficulty = self.difficulty.get()
 
             if "Easy" in difficulty:
-                self.root.destroy()
                 single_player_game(self.color, 0, 2)
+                self.root.destroy()
 
             elif "Medium" in difficulty:
-                self.root.destroy()
                 single_player_game(self.color, 0, 3)
+                self.root.destroy()
                 
             elif "Hard" in difficulty:
-                self.root.destroy()
                 single_player_game(self.color, 0, 4)
+                self.root.destroy()
 
 
 class Multiplayer(object):
@@ -143,7 +143,7 @@ class Multiplayer(object):
 
 
 pygame.font.init()
-my_font = pygame.font.SysFont("cambria", 15)
+my_font = pygame.font.SysFont("calibri", 15)
 letters = ["a", "b", "c", "d", "e", "f", "g", "h"]
 
 
@@ -156,7 +156,7 @@ def calc_mouse_pos(pos):
 def multiplayer_game(color, theme):
     pygame.init()
     game_window = pygame.display.set_mode((width, height))
-    pygame.display.set_caption("Chess")
+    pygame.display.set_caption("Chess w/ Minimax Visualizer by Jeffery Xie")
     chess_game = Game(game_window, color, theme)
     chess_game.board.initiate_pieces()
     fps = 60
@@ -193,7 +193,7 @@ def multiplayer_game(color, theme):
 def single_player_game(color, theme, depth):
     pygame.init()
     game_window = pygame.display.set_mode((width, height))
-    pygame.display.set_caption("Chess")
+    pygame.display.set_caption("Chess w/ Minimax Visualizer by Jeffery Xie")
     chess_game = Game(game_window, color, theme)
     chess_game.board.initiate_pieces()
     fps = 60
@@ -241,35 +241,35 @@ def single_player_game(color, theme, depth):
 def draw_end_screen(chess_game, game_window):
     if chess_game.checkmate_win:
         if chess_game.turn == "White":
-            main_text = my_font.render("Black won by checkmate.", True, themes[chess_game.theme][0])
+            main_text = my_font.render("Black won by checkmate.", True, [0, 0, 0])
         else:
-            main_text = my_font.render("White won by checkmate.", True, themes[chess_game.theme][0])
+            main_text = my_font.render("White won by checkmate.", True, [0, 0, 0])
     elif chess_game.stalemate_draw:
         if chess_game.turn == "Black":
-            main_text = my_font.render("Stalemate. Black has no moves.", True, themes[chess_game.theme][0])
+            main_text = my_font.render("Stalemate. Black has no moves.", True, [0, 0, 0])
         else:
-            main_text = my_font.render("Stalemate. White has no moves.", True, themes[chess_game.theme][0])
+            main_text = my_font.render("Stalemate. White has no moves.", True, [0, 0, 0])
     elif chess_game.threefold_draw:
-        main_text = my_font.render("Draw by threefold repetition.", True, themes[chess_game.theme][0])
+        main_text = my_font.render("Draw by threefold repetition.", True, [0, 0, 0])
     elif chess_game.resign:
-        main_text = my_font.render(chess_game.turn + " has resigned the game.", True, themes[chess_game.theme][0])
+        main_text = my_font.render(chess_game.turn + " has resigned the game.", True, [0, 0, 0])
     else:
-        main_text = my_font.render("Draw by insufficient material.", True, themes[chess_game.theme][0])
+        main_text = my_font.render("Draw by insufficient material.", True, [0, 0, 0])
 
     # The main box, border, and text
     pygame.draw.rect(game_window, [0, 0, 0], (85, 160, 310, 160))
-    pygame.draw.rect(game_window, [100, 100, 100], (90, 165, 300, 150))
+    pygame.draw.rect(game_window, [255, 255, 255], (87, 162, 306, 156))
     game_window.blit(main_text, (150, 180))
 
     # Play again button
-    pygame.draw.rect(game_window, [255, 255, 255], (115, 215, 110, 60))
-    pygame.draw.rect(game_window, themes[chess_game.theme][1], (120, 220, 100, 50))
+    pygame.draw.rect(game_window, [0, 0, 0], (115, 215, 110, 60))
+    pygame.draw.rect(game_window, themes[chess_game.theme][1], (117, 217, 106, 56))
     play_again_text = my_font.render("Play Again", True, [0, 0, 0])
-    game_window.blit(play_again_text, (135, 235))
+    game_window.blit(play_again_text, (140, 235))
 
     # Quit button
-    pygame.draw.rect(game_window, [255, 255, 255], (245, 215, 110, 60))
-    pygame.draw.rect(game_window, themes[chess_game.theme][1], (250, 220, 100, 50))
+    pygame.draw.rect(game_window, [0, 0, 0], (245, 215, 110, 60))
+    pygame.draw.rect(game_window, themes[chess_game.theme][1], (247, 217, 106, 56))
     quit_text = my_font.render("Quit", True, [0, 0, 0])
     game_window.blit(quit_text, (285, 235))
 

@@ -19,8 +19,6 @@ class Game(object):
         self.move_history = MoveHistory()
         self.human = Human(player_color, self)
         self.turn = "White"
-        self.show_valid_moves = True
-        self.show_AI_calculations = False
 
         # Game Over Conditions
         self.checkmate_win = False
@@ -51,14 +49,14 @@ class Game(object):
         self.board.draw_previous_move(self.window)
 
         # Draw all valid moves for selected piece
-        if self.show_valid_moves:
+        if self.board.show_valid_moves:
             self.board.draw_valid_moves(valid_moves, self.window)
 
         # Draw change theme buttons
         self.board.draw_theme_window(self.window)
 
         # Draw Game Buttons
-        self.board.draw_game_buttons(self.window)
+        self.board.draw_game_buttons(self.window, themes[self.theme])
 
         # Draw Move Log
         self.move_history.draw_move_log(self.window)
