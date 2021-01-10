@@ -91,7 +91,8 @@ To install, simply enter these commands into your terminal. (for macOS users, re
 
 # Known Bugs <a name="bugs"></a>
   * Chess AI can sometimes make a move while in check that does not result in it escaping check (illegal move). (This does not happen in local multiplayer)
-  * The chess AI does not know how to en-passant
+  * The chess AI does not know how to en-passant.
+  * Checkmate with a pawn promotion is not detected for the single player vs AI mode.
 
 # Extra Information <a name="extra"></a>
 The chess AI can hold its own in most situations, but has no grasp of positional concepts or mid to late game tactics/evaluations. The strength of my AI depends on the strength and complexity of my evaluation function, which is currently a very simple evaluation. It calculates the material still left on the board (pieces), and then calculates the relative strength of each individual piece based on its position on the board using piece square tables.
