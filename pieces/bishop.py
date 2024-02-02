@@ -7,7 +7,7 @@ bishops = [white_bishop, black_bishop]
 
 
 # Piece Square Table
-white_bishop_table = [
+white_bishop_eval_table = [
     [-20, -10, -10, -10, -10, -10, -10, -20],
     [-10,  0,  0,  0,  0,  0,  0, -10],
     [-10,  0,  5,  10,  10,  5,  0, -10],
@@ -18,9 +18,7 @@ white_bishop_table = [
     [-20, -10, -10, -10, -10, -10, -10, -20]
     ]
 
-black_bishop_table = white_bishop_table[::-1]
-bishop_tables = [white_bishop_table, black_bishop_table]
-
+black_bishop_eval_table = white_bishop_eval_table[::-1]
 
 class Bishop(Piece):
     def __init__(self, row, col, color):

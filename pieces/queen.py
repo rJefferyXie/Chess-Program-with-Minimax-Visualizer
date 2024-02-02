@@ -9,7 +9,7 @@ queens = [white_queen, black_queen]
 
 
 # Piece Square Table
-white_queen_table = [
+white_queen_eval_table = [
     [-20, -10, -10, -5, -5, -10, -10, -20],
     [-10,  0,  0,  0,  0,  0,  0, -10],
     [-10,  0,  5,  5,  5,  5,  0, -10],
@@ -20,9 +20,7 @@ white_queen_table = [
     [-20, -10, -10, -5, -5, -10, -10, -20]
     ]
 
-black_queen_table = white_queen_table[::-1]
-queen_tables = [white_queen_table, black_queen_table]
-
+black_queen_eval_table = white_queen_eval_table[::-1]
 
 class Queen(Piece):
     def __init__(self, row, col, color):

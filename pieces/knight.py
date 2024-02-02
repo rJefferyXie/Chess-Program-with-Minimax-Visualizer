@@ -6,7 +6,7 @@ black_knight = pygame.image.load("pieces/assets/Black_Knight.png")
 knights = [white_knight, black_knight]
 
 # Piece Square Table
-white_knight_table = [
+white_knight_eval_table = [
     [-50, -40, -30, -30, -30, -30, -40, -50],
     [-40, -20,  0,  0,  0,  0, -20, -40],
     [-30,  0,  10,  15,  15,  10,  0, -30],
@@ -17,9 +17,7 @@ white_knight_table = [
     [-50, -40, -30, -30, -30, -30, -40, -50]
 ]
 
-black_knight_table = white_knight_table[::-1]
-knight_tables = [white_knight_table, black_knight_table]
-
+black_knight_eval_table = white_knight_eval_table[::-1]
 
 class Knight(Piece):
     def __init__(self, row, col, color):

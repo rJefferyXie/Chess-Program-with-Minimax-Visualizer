@@ -6,7 +6,7 @@ black_pawn = pygame.image.load("pieces/assets/Black_Pawn.png")
 pawns = [white_pawn, black_pawn]
 
 # Piece Square Table
-white_pawn_table = [
+white_pawn_eval_table = [
     [0,  0,  0,  0,  0,  0,  0,  0],
     [50,  50,  50,  50,  50,  50,  50,  50],
     [10,  10,  20,  30,  30,  20,  10,  10],
@@ -17,9 +17,7 @@ white_pawn_table = [
     [0,  0,  0,  0,  0,  0,  0,  0]
     ]
 
-black_pawn_table = white_pawn_table[::-1]
-pawn_tables = [white_pawn_table, black_pawn_table]
-
+black_pawn_eval_table = white_pawn_eval_table[::-1]
 
 class Pawn(Piece):
     def __init__(self, row, col, color, direction):

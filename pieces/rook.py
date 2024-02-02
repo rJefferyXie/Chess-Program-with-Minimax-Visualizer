@@ -7,7 +7,7 @@ rooks = [white_rook, black_rook]
 
 
 # Piece Square Table
-white_rook_table = [
+white_rook_eval_table = [
     [ 0,  0,  0,  0,  0,  0,  0,  0],
     [ 5,  10,  10,  10,  10,  10,  10,  5],
     [-5,  0,  0,  0,  0,  0,  0, -5],
@@ -18,9 +18,7 @@ white_rook_table = [
     [ 0,   0, 0,  5,  5,  0,  0,  0]
     ]
 
-black_rook_table = white_rook_table[::-1]
-rook_tables = [white_rook_table, black_rook_table]
-
+black_rook_eval_table = white_rook_eval_table[::-1]
 
 class Rook(Piece):
     def __init__(self, row, col, color):

@@ -9,7 +9,7 @@ kings = [white_king, black_king]
 
 
 # Piece Square Table
-white_king_table = [
+white_king_eval_table = [
     [-30, -40, -40, -50, -50, -40, -40, -30],
     [-30, -40, -40, -50, -50, -40, -40, -30],
     [-30, -40, -40, -50, -50, -40, -40, -30],
@@ -20,9 +20,7 @@ white_king_table = [
     [ 20,  30,  10,  0,  0,  10,  30,  20]
     ]
 
-black_king_table = white_king_table[::-1]
-king_tables = [white_king_table, black_king_table]
-
+black_king_eval_table = white_king_eval_table[::-1]
 
 class King(Piece):
     def __init__(self, row, col, color):
