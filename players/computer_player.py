@@ -1,18 +1,35 @@
 from copy import deepcopy
-from pieces.pawn import Pawn, pawn_tables
-from pieces.knight import Knight, knight_tables
-from pieces.bishop import Bishop, bishop_tables
-from pieces.rook import Rook, rook_tables
-from pieces.queen import Queen, queen_tables
-from pieces.king import King, king_tables
+from pieces.pawn import Pawn, black_pawn_eval_table, white_pawn_eval_table
+from pieces.knight import Knight, black_knight_eval_table, white_knight_eval_table
+from pieces.bishop import Bishop, black_bishop_eval_table, white_bishop_eval_table
+from pieces.rook import Rook, black_rook_eval_table, white_rook_eval_table
+from pieces.queen import Queen, black_queen_eval_table, white_queen_eval_table
+from pieces.king import King, black_king_eval_table, white_king_eval_table
 import pygame
 
 # Piece Evaluations from https://www.chessprogramming.org/Simplified_Evaluation_Function
 
-
 class Computer(object):
     def __init__(self, color):
         self.color = color
+
+        self.white_piece_eval_tables = {
+            "Pawn": (100, white_pawn_eval_table),
+            "Knight": (320, white_knight_eval_table),
+            "Bishop": (330, white_bishop_eval_table),
+            "Rook": (500, white_rook_eval_table),
+            "Queen": (900, white_queen_eval_table),
+            "King": (20000, white_king_eval_table)
+        }
+
+        self.black_piece_eval_tables = {
+            "Pawn": (100, black_pawn_eval_table),
+            "Knight": (320, black_knight_eval_table),
+            "Bishop": (330, black_bishop_eval_table),
+            "Rook": (500, black_rook_eval_table),
+            "Queen": (900, black_queen_eval_table),
+            "King": (20000, black_king_eval_table)
+        }
 
     def minimax(self, board, game, depth, alpha, beta, max_player):
         if depth == 0 or game.game_over():
@@ -55,43 +72,16 @@ class Computer(object):
             return min_evaluation, best_position
 
     def get_piece_eval(self, piece):
+        piece_material = 0
+        piece_eval_table = []
+
         if piece.color == "White":
-            if isinstance(piece, Pawn):
-                return 100 + pawn_tables[0][piece.col][piece.row]
-
-            elif isinstance(piece, Knight):
-                return 320 + knight_tables[0][piece.col][piece.row]
-
-            elif isinstance(piece, Bishop):
-                return 330 + bishop_tables[0][piece.col][piece.row]
-
-            elif isinstance(piece, Rook):
-                return 500 + rook_tables[0][piece.col][piece.row]
-
-            elif isinstance(piece, Queen):
-                return 900 + queen_tables[0][piece.col][piece.row]
-
-            elif isinstance(piece, King):
-                return 20000 + king_tables[0][piece.col][piece.row]
-
-        else:
-            if isinstance(piece, Pawn):
-                return 100 + pawn_tables[1][piece.col][piece.row]
-
-            elif isinstance(piece, Knight):
-                return 320 + knight_tables[1][piece.col][piece.row]
-
-            elif isinstance(piece, Bishop):
-                return 330 + bishop_tables[1][piece.col][piece.row]
-
-            elif isinstance(piece, Rook):
-                return 500 + rook_tables[1][piece.col][piece.row]
-
-            elif isinstance(piece, Queen):
-                return 900 + queen_tables[1][piece.col][piece.row]
-
-            elif isinstance(piece, King):
-                return 20000 + king_tables[1][piece.col][piece.row]
+            piece_material, piece_eval_table = self.white_piece_eval_tables[piece.__class__.__name__]
+            
+        if piece.color == "Black":
+            piece_material, piece_eval_table = self.black_piece_eval_tables[piece.__class__.__name__]
+        
+        return piece_material + piece_eval_table[piece.row][piece.col]
 
     def evaluate(self, board):
         position_eval = 0
