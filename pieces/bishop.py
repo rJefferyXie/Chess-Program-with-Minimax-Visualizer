@@ -5,7 +5,6 @@ white_bishop = pygame.image.load("pieces/assets/White_Bishop.png")
 black_bishop = pygame.image.load("pieces/assets/Black_Bishop.png")
 bishops = [white_bishop, black_bishop]
 
-
 # Piece Square Table
 white_bishop_eval_table = [
     [-20, -10, -10, -10, -10, -10, -10, -20],
@@ -16,7 +15,7 @@ white_bishop_eval_table = [
     [-10,  10,  10,  10,  10,  10,  10, -10],
     [-10,  5,  0,  0,  0,  0,  5, -10],
     [-20, -10, -10, -10, -10, -10, -10, -20]
-    ]
+]
 
 black_bishop_eval_table = white_bishop_eval_table[::-1]
 

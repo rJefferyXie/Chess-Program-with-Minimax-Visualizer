@@ -7,7 +7,6 @@ white_king = pygame.image.load("pieces/assets/White_King.png")
 black_king = pygame.image.load("pieces/assets/Black_King.png")
 kings = [white_king, black_king]
 
-
 # Piece Square Table
 white_king_eval_table = [
     [-30, -40, -40, -50, -50, -40, -40, -30],
@@ -18,7 +17,7 @@ white_king_eval_table = [
     [-10, -20, -20, -20, -20, -20, -20, -10],
     [ 20,  20,  0,  0,  0,  0,  20,  20],
     [ 20,  30,  10,  0,  0,  10,  30,  20]
-    ]
+]
 
 black_king_eval_table = white_king_eval_table[::-1]
 

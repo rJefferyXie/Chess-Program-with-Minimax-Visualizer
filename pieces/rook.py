@@ -16,7 +16,7 @@ white_rook_eval_table = [
     [-5,  0,  0,  0,  0,  0,  0, -5],
     [-5,  0,  0,  0,  0,  0,  0, -5],
     [ 0,   0, 0,  5,  5,  0,  0,  0]
-    ]
+]
 
 black_rook_eval_table = white_rook_eval_table[::-1]
 
