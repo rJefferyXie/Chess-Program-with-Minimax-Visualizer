@@ -1,115 +1,103 @@
-from copy import deepcopy
-from pieces.pawn import Pawn, black_pawn_eval_table, white_pawn_eval_table
-from pieces.knight import Knight, black_knight_eval_table, white_knight_eval_table
-from pieces.bishop import Bishop, black_bishop_eval_table, white_bishop_eval_table
-from pieces.rook import Rook, black_rook_eval_table, white_rook_eval_table
-from pieces.queen import Queen, black_queen_eval_table, white_queen_eval_table
-from pieces.king import King, black_king_eval_table, white_king_eval_table
 import pygame
+from copy import deepcopy
+from pieces import pawn, knight, bishop, rook, queen, king
 
 # Piece Evaluations from https://www.chessprogramming.org/Simplified_Evaluation_Function
 
 class Computer(object):
+    WHITE = "White"
+    BLACK = "Black"
+
+    PIECE_TYPES = (pawn.Pawn, knight.Knight, bishop.Bishop, rook.Rook, queen.Queen, king.King)
+    PIECE_EVALUATION_TABLES = {
+        (WHITE, "Pawn"): (100, pawn.white_pawn_eval_table),
+        (WHITE, "Knight"): (320, knight.white_knight_eval_table),
+        (WHITE, "Bishop"): (330, bishop.white_bishop_eval_table),
+        (WHITE, "Rook"): (500, rook.white_rook_eval_table),
+        (WHITE, "Queen"): (900, queen.white_queen_eval_table),
+        (WHITE, "King"): (20000, king.white_king_eval_table),
+
+        (BLACK, "Pawn"): (100, pawn.black_pawn_eval_table),
+        (BLACK, "Knight"): (320, knight.black_knight_eval_table),
+        (BLACK, "Bishop"): (330, bishop.black_bishop_eval_table),
+        (BLACK, "Rook"): (500, rook.black_rook_eval_table),
+        (BLACK, "Queen"): (900, queen.black_queen_eval_table),
+        (BLACK, "King"): (20000, king.black_king_eval_table),
+    }
+
     def __init__(self, color):
         self.color = color
 
-        self.white_piece_eval_tables = {
-            "Pawn": (100, white_pawn_eval_table),
-            "Knight": (320, white_knight_eval_table),
-            "Bishop": (330, white_bishop_eval_table),
-            "Rook": (500, white_rook_eval_table),
-            "Queen": (900, white_queen_eval_table),
-            "King": (20000, white_king_eval_table)
-        }
-
-        self.black_piece_eval_tables = {
-            "Pawn": (100, black_pawn_eval_table),
-            "Knight": (320, black_knight_eval_table),
-            "Bishop": (330, black_bishop_eval_table),
-            "Rook": (500, black_rook_eval_table),
-            "Queen": (900, black_queen_eval_table),
-            "King": (20000, black_king_eval_table)
-        }
-
     def minimax(self, board, game, depth, alpha, beta, max_player):
+        if max_player not in [self.BLACK, self.WHITE]:
+          raise ValueError("Invalid max_player value: {}. Must be 'White' or 'Black'.".format(max_player))
+        
         if depth == 0 or game.game_over():
             return self.evaluate(board), board
 
-        if max_player == "White":
-            max_evaluation = float("-inf")
-            best_position = None
-            for position in self.get_all_positions(board, game, "White"):
-                current_evaluation = self.minimax(position, game, depth - 1, alpha, beta, "Black")[0]
+        best_position = None
+        best_score = float("-inf") if max_player == self.WHITE else float("inf")
+        other_player = self.BLACK if max_player == self.WHITE else self.WHITE
 
-                # If the current move was the best one so far, update best_position
-                if current_evaluation > max_evaluation:
+        for position in self.get_all_positions(board, game, max_player):
+            current_score, _ = self.minimax(position, game, depth - 1, alpha, beta, other_player)
+
+            # aside: alpha-beta pruning assumes that both players are making optimal moves to maximize or minimize their respective scores
+            if max_player == self.WHITE:
+                if current_score > best_score:
+                    best_score = current_score
                     best_position = position
-                    max_evaluation = current_evaluation
-
-                # Update alpha
-                alpha = max(alpha, max_evaluation)
-                if beta <= alpha:
-                    return max_evaluation, best_position
-
-            return max_evaluation, best_position
-
-        else:
-            min_evaluation = float("inf")
-            best_position = None
-            for position in self.get_all_positions(board, game, "Black"):
-                current_evaluation = self.minimax(position, game, depth - 1, alpha, beta, "White")[0]
-
-                # If the current move was the best one so far, update best_position
-                if current_evaluation < min_evaluation:
-                    best_position = position
-                    min_evaluation = current_evaluation
-                
-                # Update beta
-                beta = min(beta, current_evaluation)
-                if beta <= alpha:
-                    return min_evaluation, best_position
-
-            return min_evaluation, best_position
-
-    def get_piece_eval(self, piece):
-        piece_material = 0
-        piece_eval_table = []
-
-        if piece.color == "White":
-            piece_material, piece_eval_table = self.white_piece_eval_tables[piece.__class__.__name__]
+                    alpha = max(alpha, best_score)
             
-        if piece.color == "Black":
-            piece_material, piece_eval_table = self.black_piece_eval_tables[piece.__class__.__name__]
-        
+            if max_player == self.BLACK:
+                if current_score < best_score:
+                    best_score = current_score
+                    best_position = position
+                    beta = min(beta, best_score)
+            
+            # if the opponent's best possible move (beta) is less than or equal to the current player's guaranteed best move (alpha), 
+            # it means that the opponent will not choose this branch, so we prune this branch from the search tree to reduce unneccessary computations.
+            if beta <= alpha:
+                break
+          
+        return best_score, best_position
+            
+    def get_piece_value(self, piece):
+        if not isinstance(piece, self.PIECE_TYPES):
+            raise ValueError("Invalid piece: {}".format(piece))
+
+        piece_key = (piece.color, type(piece).__name__)
+        piece_material, piece_eval_table = self.PIECE_EVALUATION_TABLES[piece_key]
+
         return piece_material + piece_eval_table[piece.row][piece.col]
 
     def evaluate(self, board):
         position_eval = 0
+
         for row in board.board:
             for piece in row:
-                if isinstance(piece, (Pawn, Knight, Bishop, Rook, Queen, King)):
-                    if piece.color == "Black":
-                        position_eval -= self.get_piece_eval(piece)
+                if isinstance(piece, self.PIECE_TYPES):
+                    if piece.color == self.BLACK:
+                        position_eval -= self.get_piece_value(piece)
                     else:
-                        position_eval += self.get_piece_eval(piece)
+                        position_eval += self.get_piece_value(piece)
 
         return position_eval
 
     def get_all_positions(self, board, game, color):
-        boards = []
+        positions = []
 
-        # Get every piece on the board that is the same color as the current player's team, and update valid moves
+        # for each piece that the current player controls, simulate every possible move and save the new position in positions
         for piece in board.get_all_pieces(color):
-            if isinstance(piece, Pawn):
+            if isinstance(piece, pawn.Pawn):
                 valid_moves = piece.update_valid_moves(board.board, game.move_history.move_log)
             else:
                 valid_moves = piece.update_valid_moves(board.board)
             
-            # Simulate each move and add the new board to boards
             for move in valid_moves:
-                temp_board = deepcopy(board)
-                temp_piece = temp_board.get_piece(piece.row, piece.col)
-                new_temp_board = self.simulate_move(temp_piece, temp_board, game, move, color)
+                board_copy = deepcopy(board) # need to create a deep copy so we don't modify the original board when simulating the move
+                temp_piece = board_copy.get_piece(piece.row, piece.col)
+                new_temp_position = self.simulate_move(temp_piece, board_copy, game, move, color)
                 
                 if game.board.show_AI_calculations:
                     if game.board.AI_speed == "Medium":
@@ -117,10 +105,10 @@ class Computer(object):
                     elif game.board.AI_speed == "Slow":
                         pygame.time.delay(50)
 
-                    self.draw_moves(piece, game, new_temp_board)
-                boards.append(new_temp_board)
+                    self.draw_moves(piece, game, new_temp_position)
+                positions.append(new_temp_position)
 
-        return boards
+        return positions
 
     def simulate_move(self, piece, board, game, move, color):
         target = board.get_piece(move[0], move[1])
@@ -130,22 +118,19 @@ class Computer(object):
         board.target = (move[0], move[1])
         board.captured_piece = target
 
-        # Castling
-        if isinstance(piece, King) and isinstance(target, Rook) and piece.color == target.color:
+        if isinstance(piece, king.King) and isinstance(target, rook.Rook) and piece.color == target.color:
             dangerous_squares = game.get_dangerous_squares()
             game.castle(piece, target, move[0], move[1], dangerous_squares, board)
         else:
-            if target != 0 and target.color != color:
+            if target != 0 and target.color != color: # simulating capturing opponents piece
                 board.board[move[0]][move[1]] = 0
 
             board.move(piece, move[0], move[1])
 
-            # Promote the pawn
             if game.detect_promotion(piece):
-                board.board[piece.row][piece.col] = Queen(piece.row, piece.col, piece.color)
+                board.board[piece.row][piece.col] = queen.Queen(piece.row, piece.col, piece.color) # for simplicity sake, the computer will always promote to a queen
 
-            # If a rook or king moves, it loses castling privileges
-            if isinstance(piece, (Rook, King)):
+            if isinstance(piece, (rook.Rook, king.King)): # after a rook or king moves, it can no longer castle
                 piece.can_castle = False
 
         return board
@@ -157,14 +142,14 @@ class Computer(object):
     def computer_move(self, game, board):
         game.board.board = board.board
 
-        if isinstance(board.piece, Pawn):
-            if isinstance(board.captured_piece, (Pawn, Knight, Bishop, Rook, Queen, King)):
+        if isinstance(board.piece, pawn.Pawn):
+            if isinstance(board.captured_piece, self.PIECE_TYPES):
                 board.move_notation = game.move_history.get_file(board.piece.row) + "x" + \
                        game.move_history.get_file(board.target[0]) + str(abs(8 - board.target[1]))
             else:
                 board.move_notation = game.move_history.get_file(board.target[0]) + str(abs(8 - board.target[1]))
         else:
-            if isinstance(board.captured_piece, (Pawn, Knight, Bishop, Rook, Queen, King)):
+            if isinstance(board.captured_piece, self.PIECE_TYPES):
                 if board.captured_piece.color != board.piece.color:
                     board.move_notation = board.piece.letter + "x" + \
                                           game.move_history.get_file(board.target[0]) + str(abs(8 - board.target[1]))
