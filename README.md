@@ -20,7 +20,7 @@ A functional chess game implemented in python, with pygame as a supporting modul
 ![demo_end](https://media.discordapp.net/attachments/770779709172613122/797238283024990238/demo_resign.png)
 
 # Notes to User <a name="notes"></a>
-* Note that Pygame's graphics are going to be different depending on the machine / version of machine that you are using. I coded this on a windows machine so things look good for me, but on Mac for example text may be off center and things might look more blurry / pixelated.
+* Note that Pygame's graphics are going to be different depending on the machine / version of machine that you are using.
 * **AI Difficulties Guidelines**
   * Note that the time in between moves depends on search depth, along with the number of valid moves that the AI has.
   * Easy (Depth 2) will think for about 5-10 seconds on its moves.
