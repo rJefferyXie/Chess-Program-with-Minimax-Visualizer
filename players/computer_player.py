@@ -33,7 +33,7 @@ class Computer(object):
           raise ValueError("Invalid max_player value: {}. Must be 'White' or 'Black'.".format(max_player))
         
         if depth == 0 or game.game_over():
-            return self.evaluate(board), board
+            return self.evaluate_board(board), board
 
         best_position = None
         best_score = float("-inf") if max_player == self.WHITE else float("inf")
@@ -71,7 +71,7 @@ class Computer(object):
 
         return piece_material + piece_eval_table[piece.row][piece.col]
 
-    def evaluate(self, board):
+    def evaluate_board(self, board):
         position_eval = 0
 
         for row in board.board:
