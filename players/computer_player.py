@@ -42,7 +42,6 @@ class Computer(object):
         for position in self.get_all_positions(board, game, max_player):
             current_score, _ = self.minimax(position, game, depth - 1, alpha, beta, other_player)
 
-            # aside: alpha-beta pruning assumes that both players are making optimal moves to maximize or minimize their respective scores
             if max_player == self.WHITE:
                 if current_score > best_score:
                     best_score = current_score
@@ -54,9 +53,10 @@ class Computer(object):
                     best_score = current_score
                     best_position = position
                     beta = min(beta, best_score)
-            
-            # if the opponent's best possible move (beta) is less than or equal to the current player's guaranteed best move (alpha), 
-            # it means that the opponent will not choose this branch, so we prune this branch from the search tree to reduce unneccessary computations.
+                    
+            # if beta <= alpha, it means that the maximizing player already has a move with a better outcome than the current branch's best possible outcome
+            # this means that we can can prune this branch to reduce unneccessary computations since we know that the maximizing player will never choose this branch
+            # ASIDE: alpha-beta pruning assumes that both players are making optimal moves to maximize or minimize their respective scores
             if beta <= alpha:
                 break
           
