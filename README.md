@@ -14,10 +14,9 @@ A functional chess game implemented in python, with pygame as a supporting modul
 * [Extra Information](#extra)
 
 # Demo Images <a name="demo"></a>
-![demo_blue](https://media.discordapp.net/attachments/770779709172613122/797238276128899079/demo_blue.png)
-![demo_purple](https://media.discordapp.net/attachments/770779709172613122/797238282664411147/demo_purple.png)
-![demo_pink](https://media.discordapp.net/attachments/770779709172613122/797238278637879306/demo_pink.png)
-![demo_end](https://media.discordapp.net/attachments/770779709172613122/797238283024990238/demo_resign.png)
+![demo_blue](https://github.com/rJefferyXie/Chess-Program-with-Minimax-Visualizer/assets/73203729/c92d37e8-9312-44b0-8a25-e0eb247d3185))
+![demo_purple](https://github.com/rJefferyXie/Chess-Program-with-Minimax-Visualizer/assets/73203729/31c1e06b-eca2-4199-ac6d-5a4052545324)
+![demo_pink](https://github.com/rJefferyXie/Chess-Program-with-Minimax-Visualizer/assets/73203729/2bcc3aed-ad7c-4c24-805a-2939a7b79edf)
 
 # Notes to User <a name="notes"></a>
 * Note that Pygame's graphics are going to be different depending on the machine / version of machine that you are using.
