@@ -30,7 +30,7 @@ class Pawn(Piece):
         self.valid_moves = []
 
     def update_valid_moves(self, board, move_log):
-        self.valid_moves = self.get_valid_moves(board,  move_log)
+        self.valid_moves = self.get_valid_moves(board, move_log)
         return self.valid_moves
 
     def get_valid_moves(self, board, move_log):
