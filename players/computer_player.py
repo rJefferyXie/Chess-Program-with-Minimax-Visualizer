@@ -1,8 +1,48 @@
 import pygame
 from copy import deepcopy
 from pieces import pawn, knight, bishop, rook, queen, king
+import time
+from functools import wraps
 
 # Piece Evaluations from https://www.chessprogramming.org/Simplified_Evaluation_Function
+
+profile_data = {}
+
+def profile_function(func):
+  @wraps(func)
+  def wrapper(*args, **kwargs):
+    start_time = time.time()
+    result = func(*args, **kwargs)
+    elapsed_time = time.time() - start_time
+
+    if func.__name__ not in profile_data:
+      profile_data[func.__name__] = {"total_time": 0, "call_count": 0}
+    profile_data[func.__name__]["total_time"] += elapsed_time
+    profile_data[func.__name__]["call_count"] += 1
+
+    if func.__name__ == "minimax":
+      print(f"[{func.__name__}] Time: {elapsed_time:.4f}s Depth: {args[2]}")  # args[2] is the depth in this case.
+
+    return result
+
+  return wrapper
+
+def print_profile_summary():
+  print("\n=== Profiling Summary ===")
+  for func_name, data in profile_data.items():
+    total_time = data["total_time"]
+    call_count = data["call_count"]
+
+    if func_name == "simulate_move":
+      print(f"{func_name}: Evaluated {call_count} moves in {total_time:.4f} seconds.")
+    elif func_name == "get_all_positions":
+      print(f"{func_name}: Generated {call_count} positions in {total_time:.4f} seconds.")
+    elif func_name == "evaluate_board":
+      print(f"{func_name}: Evaluated the board {call_count} times in {total_time:.4f} seconds.")
+    elif func_name == "minimax":
+      print(f"{func_name}: Completed {call_count} recursive calls in {total_time:.4f} seconds.")
+    else:
+      print(f"{func_name}: Executed {call_count} times in {total_time:.4f} seconds.")
 
 class Computer(object):
     WHITE = "White"
@@ -29,8 +69,12 @@ class Computer(object):
         self.color = color
 
     def minimax(self, board, game, depth, alpha, beta, max_player):
+        """
+        Implements the Minimax algorithm to calculate the move that would maximize the AI's positional evaluation. 
+        Includes alpha-beta pruning to reduce the size of the search tree and reduce redundant computations.
+        """
         if max_player not in [self.BLACK, self.WHITE]:
-          raise ValueError("Invalid max_player value: {}. Must be 'White' or 'Black'.".format(max_player))
+          raise ValueError(f"Invalid max_player value: {max_player}. Must be 'White' or 'Black'.")
         
         if depth == 0 or game.game_over():
             return self.evaluate_board(board), board
@@ -63,8 +107,11 @@ class Computer(object):
         return best_score, best_position
             
     def get_piece_value(self, piece):
+        """
+        Returns the value of a piece based on its material value and position evaluation table.
+        """
         if not isinstance(piece, self.PIECE_TYPES):
-            raise ValueError("Invalid piece: {}".format(piece))
+            raise ValueError(f"Invalid piece: {piece}")
 
         piece_key = (piece.color, type(piece).__name__)
         piece_material, piece_eval_table = self.PIECE_EVALUATION_TABLES[piece_key]
@@ -72,8 +119,11 @@ class Computer(object):
         return piece_material + piece_eval_table[piece.row][piece.col]
 
     def evaluate_board(self, board):
+        """
+        Evaluates the board by calculating the net advantage of one player over the other.
+        """
         position_eval = 0
-
+        
         for row in board.board:
             for piece in row:
                 if isinstance(piece, self.PIECE_TYPES):
@@ -85,6 +135,9 @@ class Computer(object):
         return position_eval
 
     def get_all_positions(self, board, game, color):
+        """
+        Generates all possible positions after simulating the valid moves for each piece that the player owns.
+        """
         positions = []
 
         # for each piece that the current player controls, simulate every possible move and save the new position in positions
@@ -98,19 +151,28 @@ class Computer(object):
                 board_copy = deepcopy(board) # need to create a deep copy so we don't modify the original board when simulating the move
                 temp_piece = board_copy.get_piece(piece.row, piece.col)
                 new_temp_position = self.simulate_move(temp_piece, board_copy, game, move, color)
+                positions.append(new_temp_position)
                 
                 if game.board.show_AI_calculations:
-                    if game.board.AI_speed == "Medium":
-                        pygame.time.delay(20)
-                    elif game.board.AI_speed == "Slow":
-                        pygame.time.delay(50)
-
-                    self.draw_moves(piece, game, new_temp_position)
-                positions.append(new_temp_position)
-
+                    self.draw_AI_calculations(game, piece, new_temp_position)
+                    
         return positions
 
+    def draw_AI_calculations(self, game, piece, board):
+        """
+        If the user has enabled the visualize AI feature, show the current position that the AI is considering after every move.
+        """
+        if game.board.AI_speed == "Medium":
+            pygame.time.delay(20)
+        elif game.board.AI_speed == "Slow":
+            pygame.time.delay(50)
+            
+        self.draw_moves(piece, game, board)
+
     def simulate_move(self, piece, board, game, move, color):
+        """
+        Simulates a move on a copy of the board.
+        """
         target = board.get_piece(move[0], move[1])
 
         board.prev_square = (piece.row, piece.col)
@@ -118,7 +180,7 @@ class Computer(object):
         board.target = (move[0], move[1])
         board.captured_piece = target
 
-        if isinstance(piece, king.King) and isinstance(target, rook.Rook) and piece.color == target.color:
+        if isinstance(piece, king.King) and isinstance(target, rook.Rook) and piece.color == target.color: # simulating a castling move
             dangerous_squares = game.get_dangerous_squares()
             game.castle(piece, target, move[0], move[1], dangerous_squares, board)
         else:
@@ -128,7 +190,7 @@ class Computer(object):
             board.move(piece, move[0], move[1])
 
             if game.detect_promotion(piece):
-                board.board[piece.row][piece.col] = queen.Queen(piece.row, piece.col, piece.color) # for simplicity sake, the computer will always promote to a queen
+                board.board[piece.row][piece.col] = queen.Queen(piece.row, piece.col, piece.color) # for simplicity, the computer will always promote to a queen
 
             if isinstance(piece, (rook.Rook, king.King)): # after a rook or king moves, it can no longer castle
                 piece.can_castle = False
