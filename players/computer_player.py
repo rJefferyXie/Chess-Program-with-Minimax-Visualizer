@@ -3,6 +3,7 @@ from copy import deepcopy
 from pieces import pawn, knight, bishop, rook, queen, king
 import time
 from functools import wraps
+from game.zobrist import ZobristHashing
 
 # Piece Evaluations from https://www.chessprogramming.org/Simplified_Evaluation_Function
 
@@ -20,29 +21,26 @@ def profile_function(func):
     profile_data[func.__name__]["total_time"] += elapsed_time
     profile_data[func.__name__]["call_count"] += 1
 
-    if func.__name__ == "minimax":
-      print(f"[{func.__name__}] Time: {elapsed_time:.4f}s Depth: {args[2]}")  # args[2] is the depth in this case.
-
     return result
 
   return wrapper
 
 def print_profile_summary():
-  print("\n=== Profiling Summary ===")
+  print("\n------------ Chess Engine Profiling Summary ------------")
   for func_name, data in profile_data.items():
     total_time = data["total_time"]
     call_count = data["call_count"]
 
     if func_name == "simulate_move":
-      print(f"{func_name}: Evaluated {call_count} moves in {total_time:.4f} seconds.")
+      print(f"{func_name}: Evaluated {call_count} moves in {total_time:.3f} seconds.")
     elif func_name == "get_all_positions":
-      print(f"{func_name}: Generated {call_count} positions in {total_time:.4f} seconds.")
+      print(f"{func_name}: Generated {call_count} positions in {total_time:.3f} seconds.")
     elif func_name == "evaluate_board":
-      print(f"{func_name}: Evaluated the board {call_count} times in {total_time:.4f} seconds.")
+      print(f"{func_name}: Evaluated the board {call_count} times in {total_time:.3f} seconds.")
     elif func_name == "minimax":
-      print(f"{func_name}: Completed {call_count} recursive calls in {total_time:.4f} seconds.")
+      print(f"{func_name}: Completed {call_count} recursive calls in {total_time:.3f} seconds.")
     else:
-      print(f"{func_name}: Executed {call_count} times in {total_time:.4f} seconds.")
+      print(f"{func_name}: Executed {call_count} times in {total_time:.3f} seconds.")
 
 class Computer(object):
     WHITE = "White"
@@ -67,15 +65,15 @@ class Computer(object):
 
     def __init__(self, color):
         self.color = color
+        self.transposition_table = {}
+        self.zobrist = ZobristHashing(8, 8, [ptype.__name__ for ptype in self.PIECE_TYPES], [self.WHITE, self.BLACK])
 
+    @profile_function
     def minimax(self, board, game, depth, alpha, beta, max_player):
         """
         Implements the Minimax algorithm to calculate the move that would maximize the AI's positional evaluation. 
         Includes alpha-beta pruning to reduce the size of the search tree and reduce redundant computations.
         """
-        if max_player not in [self.BLACK, self.WHITE]:
-          raise ValueError(f"Invalid max_player value: {max_player}. Must be 'White' or 'Black'.")
-        
         if depth == 0 or game.game_over():
             return self.evaluate_board(board), board
 
@@ -108,22 +106,24 @@ class Computer(object):
             
     def get_piece_value(self, piece):
         """
-        Returns the value of a piece based on its material value and position evaluation table.
+        Calculate the value of a piece using material and positional evaluation.        
         """
-        if not isinstance(piece, self.PIECE_TYPES):
-            raise ValueError(f"Invalid piece: {piece}")
-
         piece_key = (piece.color, type(piece).__name__)
         piece_material, piece_eval_table = self.PIECE_EVALUATION_TABLES[piece_key]
 
-        return piece_material + piece_eval_table[piece.row][piece.col]
+        return piece_material + piece_eval_table[piece.row][piece.col]        
 
+    @profile_function
     def evaluate_board(self, board):
         """
-        Evaluates the board by calculating the net advantage of one player over the other.
+        Evaluate the board state, considering material and positional advantages.        
         """
+        # use the cached result if this board state has already been evaluated before
+        board_hash = self.zobrist.calculate_hash(board)
+        if board_hash in self.transposition_table:
+            return self.transposition_table[board_hash]
+                
         position_eval = 0
-        
         for row in board.board:
             for piece in row:
                 if isinstance(piece, self.PIECE_TYPES):
@@ -132,14 +132,18 @@ class Computer(object):
                     else:
                         position_eval += self.get_piece_value(piece)
 
+        self.transposition_table[board_hash] = position_eval
         return position_eval
 
+    @profile_function
     def get_all_positions(self, board, game, color):
         """
         Generates all possible positions after simulating the valid moves for each piece that the player owns.
         """
-        positions = []
-
+        all_positions = []
+        passive_positions = []
+        positions_with_capture = []
+        
         # for each piece that the current player controls, simulate every possible move and save the new position in positions
         for piece in board.get_all_pieces(color):
             if isinstance(piece, pawn.Pawn):
@@ -150,13 +154,21 @@ class Computer(object):
             for move in valid_moves:
                 board_copy = deepcopy(board) # need to create a deep copy so we don't modify the original board when simulating the move
                 temp_piece = board_copy.get_piece(piece.row, piece.col)
-                new_temp_position = self.simulate_move(temp_piece, board_copy, game, move, color)
-                positions.append(new_temp_position)
+                new_temp_position, did_capture_piece = self.simulate_move(temp_piece, board_copy, game, move, color)
+                
+                if did_capture_piece:
+                    positions_with_capture.append(new_temp_position)
+                else:
+                    passive_positions.append(new_temp_position)
                 
                 if game.board.show_AI_calculations:
                     self.draw_AI_calculations(game, piece, new_temp_position)
-                    
-        return positions
+
+        # by using move ordering and putting positions where the AI captured a piece first, we evaluate the moves
+        # that are likely to be the strongest earlier in the search tree, making alpha-beta pruning more efficient.
+        all_positions.extend(positions_with_capture)
+        all_positions.extend(passive_positions)
+        return all_positions
 
     def draw_AI_calculations(self, game, piece, board):
         """
@@ -169,16 +181,18 @@ class Computer(object):
             
         self.draw_moves(piece, game, board)
 
+    @profile_function
     def simulate_move(self, piece, board, game, move, color):
         """
         Simulates a move on a copy of the board.
         """
+        did_capture_piece = False
         target = board.get_piece(move[0], move[1])
 
         board.prev_square = (piece.row, piece.col)
         board.piece = piece
         board.target = (move[0], move[1])
-        board.captured_piece = target
+        board.did_capture_piece = target
 
         if isinstance(piece, king.King) and isinstance(target, rook.Rook) and piece.color == target.color: # simulating a castling move
             dangerous_squares = game.get_dangerous_squares()
@@ -186,6 +200,7 @@ class Computer(object):
         else:
             if target != 0 and target.color != color: # simulating capturing opponents piece
                 board.board[move[0]][move[1]] = 0
+                did_capture_piece = True
 
             board.move(piece, move[0], move[1])
 
@@ -194,8 +209,15 @@ class Computer(object):
 
             if isinstance(piece, (rook.Rook, king.King)): # after a rook or king moves, it can no longer castle
                 piece.can_castle = False
+        
+        # Initialize the hash if not already set
+        if not board.hash:
+            board.hash = self.zobrist.calculate_hash(board)
 
-        return board
+        # Update the Zobrist hash
+        board.hash = self.zobrist.update_hash(board.hash, piece, board.prev_square, board.target)
+
+        return board, did_capture_piece
 
     def draw_moves(self, piece, game, board):
         valid_moves = piece.valid_moves
@@ -224,3 +246,6 @@ class Computer(object):
         game.board.previous_move = [(board.prev_square[0], board.prev_square[1]), (board.target[0], board.target[1])]
         game.update_game()
         game.check_game_status()
+
+        print_profile_summary()
+        profile_data.clear()
