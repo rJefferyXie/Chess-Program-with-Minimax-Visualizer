@@ -24,6 +24,7 @@ class Board(object):
         self.piece = None
         self.target = None
         self.captured_piece = None
+        self.hash = None
         self.board = [
             [0, 0, 0, 0, 0, 0, 0, 0],
             [0, 0, 0, 0, 0, 0, 0, 0],
