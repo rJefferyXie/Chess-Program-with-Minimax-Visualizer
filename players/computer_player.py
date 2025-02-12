@@ -80,7 +80,7 @@ class Computer(object):
   @profile_function
   def minimax(self, board, game, depth, alpha, beta, max_player):
     """
-    Implements the Minimax algorithm to calculate the move that would maximize the AI's positional evaluation. 
+    Implements the Minimax algorithm to calculate the move that would maximize the AI's positional evaluation.
     Includes alpha-beta pruning to reduce the size of the search tree and reduce redundant computations.
     """
     if depth == 0 or game.game_over():
@@ -116,7 +116,7 @@ class Computer(object):
 
   def get_piece_value(self, piece):
     """
-    Calculate the value of a piece using material and positional evaluation.        
+    Calculate the value of a piece using material and positional evaluation.
     """
     piece_key = (piece.color, type(piece).__name__)
     piece_material, piece_eval_table = self.PIECE_EVALUATION_TABLES[piece_key]
@@ -126,7 +126,7 @@ class Computer(object):
   @profile_function
   def evaluate_board(self, board):
     """
-    Evaluate the board state, considering material and positional advantages.        
+    Evaluate the board state, considering material and positional advantages.
     """
     # use the cached result if this board state has already been evaluated before
     board_hash = self.zobrist.calculate_hash(board)
@@ -156,7 +156,10 @@ class Computer(object):
 
     # for each piece that the current player controls, simulate every possible move and save the new position in positions
     for piece in board.get_all_pieces(color):
-      piece.update_valid_moves(board.board)
+      if isinstance(piece, pawn.Pawn):
+        piece.update_valid_moves(board.board, game.move_history.move_log)
+      else:
+        piece.update_valid_moves(board.board)
 
       for move in piece.valid_moves:
         # need to create a deep copy so we don't modify the original board when simulating the move
