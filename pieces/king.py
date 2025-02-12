@@ -15,109 +15,55 @@ white_king_eval_table = [
     [-30, -40, -40, -50, -50, -40, -40, -30],
     [-20, -30, -30, -40, -40, -30, -30, -20],
     [-10, -20, -20, -20, -20, -20, -20, -10],
-    [ 20,  20,  0,  0,  0,  0,  20,  20],
-    [ 20,  30,  10,  0,  0,  10,  30,  20]
+    [20, 20, 0, 0, 0, 0, 20, 20],
+    [20, 30, 10, 0, 0, 10, 30, 20]
 ]
 
 black_king_eval_table = white_king_eval_table[::-1]
 
+
 class King(Piece):
-    def __init__(self, row, col, color):
-        super().__init__(row, col, color)
-        self.row = row
-        self.col = col
-        self.color = color
-        self.valid_moves = []
-        self.can_castle = True
-        self.is_checked = False
-        self.letter = "K"
+  def __init__(self, row, col, color):
+    super().__init__(row, col, color)
+    self.valid_moves = []
+    self.can_castle = True
+    self.is_checked = False
+    self.letter = "K"
 
-    def update_valid_moves(self, board):
-        self.valid_moves = self.get_valid_moves(board)
-        return self.valid_moves
+  def update_valid_moves(self, board):
+    self.valid_moves = self.get_valid_moves(board)
+    return self.valid_moves
 
-    def get_valid_moves(self, board):
-        moves = []
+  def get_valid_moves(self, board):
+    moves = []
+    directions = [
+        (-1, -1), (-1, 0), (-1, 1),  # Up-Left, Up, Up-Right
+        (0, -1), (0, 1),  # Left, Right
+        (1, -1), (1, 0), (1, 1)  # Down-Left, Down, Down-Right
+    ]
 
-        # Up Left
-        if self.row - 1 >= 0 and self.col - 1 >= 0:
-            piece = board[self.row - 1][self.col - 1]
-            if piece == 0:
-                moves.append((self.row - 1, self.col - 1))
-            elif piece.color != self.color:
-                moves.append((piece.row, piece.col))
+    # Standard King Moves
+    for dx, dy in directions:
+      new_row, new_col = self.row + dx, self.col + dy
+      if 0 <= new_row < 8 and 0 <= new_col < 8:  # Stay within board
+        piece = board[new_row][new_col]
+        if piece == 0 or piece.color != self.color:  # Empty or Opponent's piece
+          moves.append((new_row, new_col))
 
-        # Up
-        if self.col - 1 >= 0:
-            piece = board[self.row][self.col - 1]
-            if piece == 0:
-                moves.append((self.row, self.col - 1))
-            elif piece.color != self.color:
-                moves.append((piece.row, piece.col))
+    # Castling
+    if self.can_castle and not self.is_checked:
+      # Queenside Castle
+      if all(board[self.row][self.col - i] == 0 for i in range(1, 4)) and \
+              isinstance(board[self.row][self.col - 4], Rook):
+        rook = board[self.row][self.col - 4]
+        if rook.can_castle:
+          moves.append((self.row, self.col - 2))
 
-        # Up Right
-        if self.row + 1 <= 7 and self.col - 1 >= 0:
-            piece = board[self.row + 1][self.col - 1]
-            if piece == 0:
-                moves.append((self.row + 1, self.col - 1))
-            elif piece.color != self.color:
-                moves.append((piece.row, piece.col))
+    # Kingside Castle
+    if all(board[self.row][self.col + i] == 0 for i in range(1, 3)) and \
+            isinstance(board[self.row][self.col + 3], Rook):
+      rook = board[self.row][self.col + 3]
+      if rook.can_castle:
+        moves.append((self.row, self.col + 2))
 
-        # Right
-        if self.row + 1 <= 7:
-            piece = board[self.row + 1][self.col]
-            if piece == 0:
-                moves.append((self.row + 1, self.col))
-            elif piece.color != self.color:
-                moves.append((piece.row, piece.col))
-
-        # Down Right
-        if self.row + 1 <= 7 and self.col + 1 <= 7:
-            piece = board[self.row + 1][self.col + 1]
-            if piece == 0:
-                moves.append((self.row + 1, self.col + 1))
-            elif piece.color != self.color:
-                moves.append((piece.row, piece.col))
-
-        # Down
-        if self.col + 1 <= 7:
-            piece = board[self.row][self.col + 1]
-            if piece == 0:
-                moves.append((self.row, self.col + 1))
-            elif piece.color != self.color:
-                moves.append((piece.row, piece.col))
-
-        # Down Left
-        if self.row - 1 >= 0 and self.col + 1 <= 7:
-            piece = board[self.row - 1][self.col + 1]
-            if piece == 0:
-                moves.append((self.row - 1, self.col + 1))
-            elif piece.color != self.color:
-                moves.append((piece.row, piece.col))
-
-        # Left
-        if self.row - 1 >= 0:
-            piece = board[self.row - 1][self.col]
-            if piece == 0:
-                moves.append((self.row - 1, self.col))
-            elif piece.color != self.color:
-                moves.append((piece.row, piece.col))
-
-        # Castling
-        if self.can_castle and not self.is_checked:
-            # Check if the path to the a rook is empty
-            if board[self.row - 1][self.col] == 0 and board[self.row - 2][self.col] == 0 and \
-                    board[self.row - 3][self.col] == 0 and isinstance(board[self.row - 4][self.col], Rook):
-                piece = board[self.row - 4][self.col]
-                if piece.can_castle:
-                    moves.append((piece.row, piece.col))
-
-            # Check if path to the h rook is empty
-            if board[self.row + 1][self.col] == 0 and board[self.row + 2][self.col] == 0 and \
-                    isinstance(board[self.row + 3][self.col], Rook):
-                piece = board[self.row + 3][self.col]
-                if isinstance(piece, Rook):
-                    if piece.can_castle:
-                        moves.append((piece.row, piece.col))
-
-        return moves
+    return moves
