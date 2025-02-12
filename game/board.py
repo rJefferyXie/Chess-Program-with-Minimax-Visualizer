@@ -23,7 +23,7 @@ class Board(object):
         self.prev_square = None
         self.piece = None
         self.target = None
-        self.captured_piece = None
+        self.captured_piece = 0
         self.hash = None
         self.board = [
             [0, 0, 0, 0, 0, 0, 0, 0],
