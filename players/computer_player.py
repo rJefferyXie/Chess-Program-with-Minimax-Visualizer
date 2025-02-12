@@ -201,6 +201,7 @@ class Computer(object):
         else:
             if target != 0 and target.color != color: # simulating capturing opponents piece
                 board.board[move[0]][move[1]] = 0
+                board.captured_piece = target
                 did_capture_piece = True
 
             board.move(piece, move[0], move[1])
