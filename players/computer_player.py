@@ -147,12 +147,9 @@ class Computer(object):
         
         # for each piece that the current player controls, simulate every possible move and save the new position in positions
         for piece in board.get_all_pieces(color):
-            if isinstance(piece, pawn.Pawn):
-                valid_moves = piece.update_valid_moves(board.board, game.move_history.move_log)
-            else:
-                valid_moves = piece.update_valid_moves(board.board)
+            piece.update_valid_moves(board.board)
             
-            for move in valid_moves:
+            for move in piece.valid_moves:
                 board_copy = deepcopy(board) # need to create a deep copy so we don't modify the original board when simulating the move
                 temp_piece = board_copy.get_piece(piece.row, piece.col)
                 new_temp_position, did_capture_piece = self.simulate_move(temp_piece, board_copy, game, move, color)
@@ -230,18 +227,18 @@ class Computer(object):
 
         if isinstance(board.piece, pawn.Pawn):
             if isinstance(board.captured_piece, self.PIECE_TYPES):
-                board.move_notation = game.move_history.get_file(board.piece.row) + "x" + \
-                       game.move_history.get_file(board.target[0]) + str(abs(8 - board.target[1]))
+                board.move_notation = game.move_history.get_file(board.piece.col) + "x" + \
+                       game.move_history.get_file(board.target[1]) + str(abs(8 - board.target[0]))
             else:
-                board.move_notation = game.move_history.get_file(board.target[0]) + str(abs(8 - board.target[1]))
+                board.move_notation = game.move_history.get_file(board.target[1]) + str(abs(8 - board.target[0]))
         else:
             if isinstance(board.captured_piece, self.PIECE_TYPES):
                 if board.captured_piece.color != board.piece.color:
                     board.move_notation = board.piece.letter + "x" + \
-                                          game.move_history.get_file(board.target[0]) + str(abs(8 - board.target[1]))
+                                          game.move_history.get_file(board.target[1]) + str(abs(8 - board.target[0]))
             else:
                 board.move_notation = board.piece.letter + \
-                                      game.move_history.get_file(board.target[0]) + str(abs(8 - board.target[1]))
+                                      game.move_history.get_file(board.target[1]) + str(abs(8 - board.target[0]))
         if board.captured_piece != 0 and board.captured_piece.color != board.piece.color:
             game.capture(board.captured_piece)
         game.move_history.move_log.append(board.move_notation)
