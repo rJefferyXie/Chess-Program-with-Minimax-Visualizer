@@ -45,8 +45,9 @@ class Bishop(Piece):
           break
 
         piece = board[row][col]
-        if piece and piece.color != self.color:
-          moves.append((row, col))
+        if piece != 0:
+          if piece.color != self.color:
+            moves.append((row, col))
           break
 
         moves.append((row, col))
