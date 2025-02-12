@@ -18,6 +18,7 @@ def profile_function(func):
 
     if func.__name__ not in profile_data:
       profile_data[func.__name__] = {"total_time": 0, "call_count": 0}
+      
     profile_data[func.__name__]["total_time"] += elapsed_time
     profile_data[func.__name__]["call_count"] += 1
 
