@@ -108,13 +108,12 @@ class Human(object):
 
                 if isinstance(self.selected_piece, (Knight, Bishop, Rook, Queen, King)):
                     move_str = self.selected_piece.letter + "x" + \
-                               self.game.move_history.get_file(row) + str(abs(8 - col))
+                               self.game.move_history.get_file(col) + str(abs(8 - row))
 
                 elif isinstance(self.selected_piece, Pawn):
-                    if abs(self.selected_piece.col - prev_col) <= 1:
-                        self.selected_piece.vulnerable_to_en_passant = False
+                    self.selected_piece.vulnerable_to_en_passant = False
 
-                    move_str = self.game.move_history.get_file(prev_row) + "x" + self.game.move_history.get_file(row) + str(abs(8 - col))
+                    move_str = self.game.move_history.get_file(prev_col) + "x" + self.game.move_history.get_file(col) + str(abs(8 - row))
                     if self.game.detect_promotion(self.selected_piece):
                         self.promoting = True
 
@@ -134,7 +133,7 @@ class Human(object):
                 return False
             else:
                 if isinstance(self.selected_piece, (Knight, Bishop, Rook, Queen, King)):
-                    move_str = self.selected_piece.letter + self.game.move_history.get_file(row) + str(abs(8 - col))
+                    move_str = self.selected_piece.letter + self.game.move_history.get_file(col) + str(abs(8 - row))
 
                     # If a king or a rook moves before castling, it can no longer castle
                     if isinstance(self.selected_piece, (Rook, King)):
@@ -142,29 +141,31 @@ class Human(object):
                         
                 elif isinstance(self.selected_piece, Pawn):
                     # If a pawn only moves 1 square, it is not vulnerable to en passant
-                    if abs(self.selected_piece.col - prev_col) <= 1:
+                    if abs(self.selected_piece.row - prev_row) == 2:
+                        self.selected_piece.vulnerable_to_en_passant = True
+                    else:
                         self.selected_piece.vulnerable_to_en_passant = False
 
                     # Pawn captures by en passant
                     if self.selected_piece.direction == "Up":
-                        piece = self.game.board.board[self.selected_piece.row][self.selected_piece.col + 1]
+                        piece = self.game.board.board[self.selected_piece.row + 1][self.selected_piece.col]
                         if isinstance(piece, Pawn):
-                            self.game.board.board[self.selected_piece.row][self.selected_piece.col + 1] = 0
+                            self.game.board.board[self.selected_piece.row + 1][self.selected_piece.col] = 0
                             self.game.capture(piece)
-                            move_str = self.game.move_history.get_file(row) + "x" + str(abs(8 - col))
+                            move_str = self.game.move_history.get_file(col) + "x" + str(abs(8 - row))
 
                         else:
-                            move_str = self.game.move_history.get_file(row) + str(abs(8 - col))
+                            move_str = self.game.move_history.get_file(col) + str(abs(8 - row))
 
                     else:
-                        piece = self.game.board.board[self.selected_piece.row][self.selected_piece.col - 1]
+                        piece = self.game.board.board[self.selected_piece.row - 1][self.selected_piece.col]
                         if isinstance(piece, Pawn):
-                            self.game.board.board[self.selected_piece.row][self.selected_piece.col - 1] = 0
+                            self.game.board.board[self.selected_piece.row - 1][self.selected_piece.col] = 0
                             self.game.capture(piece)
-                            move_str = self.game.move_history.get_file(row) + "x" + str(abs(8 - col))
+                            move_str = self.game.move_history.get_file(col) + "x" + str(abs(8 - row))
 
                         else:
-                            move_str = self.game.move_history.get_file(row) + str(abs(8 - col))
+                            move_str = self.game.move_history.get_file(col) + str(abs(8 - row))
 
                     if self.game.detect_promotion(self.selected_piece):
                         self.promoting = True

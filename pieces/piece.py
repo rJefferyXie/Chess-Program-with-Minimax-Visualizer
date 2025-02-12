@@ -17,4 +17,4 @@ class Piece(object):
     self.col = col
 
   def draw(self, window, image):
-    window.blit(image, (self.row * square_size, self.col * square_size))
+    window.blit(image, (self.col * square_size, self.row * square_size))

@@ -45,33 +45,53 @@ class Board(object):
 
     def initiate_pieces(self):
         if self.player_color == "White":
-            pieces = [Rook(0, 0, "Black"), Knight(1, 0, "Black"), Bishop(2, 0, "Black"), Queen(3, 0, "Black"),
-                      King(4, 0, "Black"), Bishop(5, 0, "Black"), Knight(6, 0, "Black"), Rook(7, 0, "Black"),
-                      Pawn(0, 1, "Black", "Down"), Pawn(1, 1, "Black", "Down"),
-                      Pawn(2, 1, "Black", "Down"), Pawn(3, 1, "Black", "Down"),
-                      Pawn(4, 1, "Black", "Down"), Pawn(5, 1, "Black", "Down"),
-                      Pawn(6, 1, "Black", "Down"), Pawn(7, 1, "Black", "Down"),
+            # Place Black pieces on top row (row 0 to 1)
+            pieces = [
+                Rook(0, 0, "Black"), Knight(0, 1, "Black"), Bishop(
+                    0, 2, "Black"), Queen(0, 3, "Black"),
+                King(0, 4, "Black"), Bishop(0, 5, "Black"), Knight(
+                    0, 6, "Black"), Rook(0, 7, "Black"),
+                Pawn(1, 0, "Black", "Down"), Pawn(
+                    1, 1, "Black", "Down"), Pawn(1, 2, "Black", "Down"),
+                Pawn(1, 3, "Black", "Down"), Pawn(
+                    1, 4, "Black", "Down"), Pawn(1, 5, "Black", "Down"),
+                Pawn(1, 6, "Black", "Down"), Pawn(1, 7, "Black", "Down"),
 
-                      Rook(0, 7, "White"), Knight(1, 7, "White"), Bishop(2, 7, "White"), Queen(3, 7, "White"),
-                      King(4, 7, "White"), Bishop(5, 7, "White"), Knight(6, 7, "White"), Rook(7, 7, "White"),
-                      Pawn(0, 6, "White", "Up"), Pawn(1, 6, "White", "Up"),
-                      Pawn(2, 6, "White", "Up"), Pawn(3, 6, "White", "Up"),
-                      Pawn(4, 6, "White", "Up"), Pawn(5, 6, "White", "Up"),
-                      Pawn(6, 6, "White", "Up"), Pawn(7, 6, "White", "Up")]
+                # Place White pieces on bottom row (row 6 to 7)
+                Rook(7, 0, "White"), Knight(7, 1, "White"), Bishop(
+                    7, 2, "White"), Queen(7, 3, "White"),
+                King(7, 4, "White"), Bishop(7, 5, "White"), Knight(
+                    7, 6, "White"), Rook(7, 7, "White"),
+                Pawn(6, 0, "White", "Up"), Pawn(
+                    6, 1, "White", "Up"), Pawn(6, 2, "White", "Up"),
+                Pawn(6, 3, "White", "Up"), Pawn(
+                    6, 4, "White", "Up"), Pawn(6, 5, "White", "Up"),
+                Pawn(6, 6, "White", "Up"), Pawn(6, 7, "White", "Up")
+            ]
         else:
-            pieces = [Rook(0, 0, "White"), Knight(1, 0, "White"), Bishop(2, 0, "White"), Queen(3, 0, "White"),
-                      King(4, 0, "White"), Bishop(5, 0, "White"), Knight(6, 0, "White"), Rook(7, 0, "White"),
-                      Pawn(0, 1, "White", "Down"), Pawn(1, 1, "White", "Down"),
-                      Pawn(2, 1, "White", "Down"), Pawn(3, 1, "White", "Down"),
-                      Pawn(4, 1, "White", "Down"), Pawn(5, 1, "White", "Down"),
-                      Pawn(6, 1, "White", "Down"), Pawn(7, 1, "White", "Down"),
+            # Place White pieces on top row (row 0 to 1)
+            pieces = [
+                Rook(0, 0, "White"), Knight(0, 1, "White"), Bishop(
+                    0, 2, "White"), Queen(0, 3, "White"),
+                King(0, 4, "White"), Bishop(0, 5, "White"), Knight(
+                    0, 6, "White"), Rook(0, 7, "White"),
+                Pawn(1, 0, "White", "Down"), Pawn(
+                    1, 1, "White", "Down"), Pawn(1, 2, "White", "Down"),
+                Pawn(1, 3, "White", "Down"), Pawn(
+                    1, 4, "White", "Down"), Pawn(1, 5, "White", "Down"),
+                Pawn(1, 6, "White", "Down"), Pawn(1, 7, "White", "Down"),
 
-                      Rook(0, 7, "Black"), Knight(1, 7, "Black"), Bishop(2, 7, "Black"), Queen(3, 7, "Black"),
-                      King(4, 7, "Black"), Bishop(5, 7, "Black"), Knight(6, 7, "Black"), Rook(7, 7, "Black"),
-                      Pawn(0, 6, "Black", "Up"), Pawn(1, 6, "Black", "Up"),
-                      Pawn(2, 6, "Black", "Up"), Pawn(3, 6, "Black", "Up"),
-                      Pawn(4, 6, "Black", "Up"), Pawn(5, 6, "Black", "Up"),
-                      Pawn(6, 6, "Black", "Up"), Pawn(7, 6, "Black", "Up")]
+                # Place Black pieces on bottom row (row 6 to 7)
+                Rook(7, 0, "Black"), Knight(7, 1, "Black"), Bishop(
+                    7, 2, "Black"), Queen(7, 3, "Black"),
+                King(7, 4, "Black"), Bishop(7, 5, "Black"), Knight(
+                    7, 6, "Black"), Rook(7, 7, "Black"),
+                Pawn(6, 0, "Black", "Up"), Pawn(
+                    6, 1, "Black", "Up"), Pawn(6, 2, "Black", "Up"),
+                Pawn(6, 3, "Black", "Up"), Pawn(
+                    6, 4, "Black", "Up"), Pawn(6, 5, "Black", "Up"),
+                Pawn(6, 6, "Black", "Up"), Pawn(6, 7, "Black", "Up")
+            ]
 
         for piece in pieces:
             self.board[piece.row][piece.col] = piece
@@ -217,19 +237,19 @@ class Board(object):
     def draw_valid_moves(self, moves, window):
         for move in moves:
             row, col = move
-            self.draw_move_square(row, col, [128, 5, 242], window)
+            self.draw_move_square(col, row, [128, 5, 242], window)
 
     def draw_previous_move(self, window):
         if self.previous_move is not None:
             # Previous Square
             prev_row = self.previous_move[0][0]
             prev_col = self.previous_move[0][1]
-            self.draw_move_square(prev_row, prev_col, [21, 35, 230], window)
+            self.draw_move_square(prev_col, prev_row, [21, 35, 230], window)
 
             # New Square
             new_row = self.previous_move[1][0]
             new_col = self.previous_move[1][1]
-            self.draw_move_square(new_row, new_col, [21, 35, 230], window)
+            self.draw_move_square(new_col, new_row, [21, 35, 230], window)
 
     def draw_move_square(self, row, col, color, window):
         # Top line

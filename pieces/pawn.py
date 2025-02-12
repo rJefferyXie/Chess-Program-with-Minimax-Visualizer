@@ -24,7 +24,7 @@ class Pawn(Piece):
   def __init__(self, row, col, color, direction):
     super().__init__(row, col, color)
     self.direction = direction
-    self.vulnerable_to_en_passant = True
+    self.vulnerable_to_en_passant = False
     self.valid_moves = []
 
   def update_valid_moves(self, board, move_log):
@@ -36,44 +36,38 @@ class Pawn(Piece):
 
     # Direction mapping for Up and Down
     dir_map = {
-        "Up": {"move": -1, "start": 6, "en_passant_row": 3},
-        "Down": {"move": 1, "start": 1, "en_passant_row": 4}
+        "Up": {"move": -1, "start": 6},
+        "Down": {"move": 1, "start": 1}
     }
     direction = dir_map[self.direction]
     move = direction["move"]
 
     # Moving forward
-    if board[self.row][self.col + move] == 0:
-      moves.append((self.row, self.col + move))
-      if self.col == direction["start"] and board[self.row][self.col + (2 * move)] == 0:
-        moves.append((self.row, self.col + (2 * move)))
+    if 0 <= self.row + move < 8 and board[self.row + move][self.col] == 0:
+      moves.append((self.row + move, self.col))
+      # Two-square move from the start
+      if self.row == direction["start"] and 0 <= self.row + (2 * move) < 8 and board[self.row + (2 * move)][self.col] == 0:
+        moves.append((self.row + (2 * move), self.col))
 
     # Capturing diagonally
     for dx in [-1, 1]:
-      new_row, new_col = self.row + dx, self.col + move
+      new_row, new_col = self.row + move, self.col + dx
       if 0 <= new_row < 8 and 0 <= new_col < 8:
         target = board[new_row][new_col]
         if target != 0 and target.color != self.color:
           moves.append((new_row, new_col))
 
     # En Passant
-    if self.col == direction["en_passant_row"]:
+    if move_log:
       for dx in [-1, 1]:
-        new_row = self.row + dx
-        if 0 <= new_row < 8:
-          adjacent = board[new_row][self.col]
-          if isinstance(adjacent, Pawn) and adjacent.color != self.color and adjacent.vulnerable_to_en_passant:
-            moves.append((new_row, self.col + move))
+        new_col = self.col + dx
+        if 0 <= new_col < 8:
+          adjacent = board[self.row][new_col]
+          if isinstance(adjacent, Pawn) and adjacent.color != self.color and adjacent.vulnerable_to_en_passant \
+          and new_col == self.get_row(move_log[-1][0]) and self.row == abs(int(move_log[-1][1]) - 8):
+            moves.append((self.row + move, new_col))
 
     return moves
 
   def get_row(self, letter):
     return {'a': 0, 'b': 1, 'c': 2, 'd': 3, 'e': 4, 'f': 5, 'g': 6, 'h': 7}.get(letter)
-
-  def add_en_passant_move(self, piece, move_log, moves, direction):
-    if piece.row == self.get_row(move_log[-1][0]) and piece.col == abs(int(move_log[-1][1]) - 8):
-      if piece.vulnerable_to_en_passant:
-        offset = -1 if direction == "Up" else 1
-        moves.append((piece.row, piece.col + offset))
-
-    return moves

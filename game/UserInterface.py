@@ -148,9 +148,9 @@ letters = ["a", "b", "c", "d", "e", "f", "g", "h"]
 
 
 def calc_mouse_pos(pos):
-    col = pos[0] // square_size
     row = pos[1] // square_size
-    return col, row
+    col = pos[0] // square_size
+    return row, col
 
 
 def multiplayer_game(color, theme):
