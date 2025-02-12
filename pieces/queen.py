@@ -34,8 +34,8 @@ class Queen(Piece):
 
   def get_valid_moves(self, board):
     diagonal_moves = Bishop.get_valid_moves(
-        Bishop(self.row, self.col, self.color), board)
+      Bishop(self.row, self.col, self.color), board)
     straight_moves = Rook.get_valid_moves(
-        Rook(self.row, self.col, self.color), board)
+      Rook(self.row, self.col, self.color), board)
 
     return diagonal_moves + straight_moves
