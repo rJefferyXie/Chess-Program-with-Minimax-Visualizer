@@ -49,6 +49,7 @@ class Rook(Piece):
         if piece != 0:
           if piece.color != self.color:
             moves.append((row, col))
+          break
 
         moves.append((row, col))
 
