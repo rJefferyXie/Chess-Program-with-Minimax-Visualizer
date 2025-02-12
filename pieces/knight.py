@@ -43,9 +43,9 @@ class Knight(Piece):
       new_row = self.row + move[0]
       new_col = self.col + move[1]
 
-    if 0 <= new_row < 8 and 0 <= new_col < 8:  # Ensure within board bounds
-      piece = board[new_row][new_col]
-      if piece == 0 or piece.color != self.color:  # Empty or opponent's piece
-        moves.append((new_row, new_col))
+      if 0 <= new_row < 8 and 0 <= new_col < 8:  # Ensure within board bounds
+        piece = board[new_row][new_col]
+        if piece == 0 or piece.color != self.color:  # Empty or opponent's piece
+          moves.append((new_row, new_col))
 
     return moves
