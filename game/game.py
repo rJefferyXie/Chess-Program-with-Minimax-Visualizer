@@ -276,24 +276,21 @@ class Game(object):
         if piece.color == "White":
             self.board.material.add_to_captured_pieces(piece, self.board.material.captured_white_pieces)
 
-    def castle(self, king, rook, row, col, dangerous_squares, board):
-        # Save a temp variable for rook column
-        rook_col = rook.col
-
+    def castle(self, king, rook, row, col, dangerous_squares, board):        
         # Long Castle
         if row == 0:
-            if ((row + 1, col) and (row + 2, col) and (row + 3, col)) not in dangerous_squares:
-                board.move(rook, 3, king.col)
-                board.move(king, 2, rook_col)
+            if ((col + 1) and (row, col + 2) and (row, col + 3)) not in dangerous_squares:
+                board.move(rook, 0, 3)
+                board.move(king, 0, 2)
                 board.move_notation = "O-O-O"
             else:
                 return False
 
         # Short Castle
         elif row == 7:
-            if (row - 1, col) and (row - 2, col) not in dangerous_squares:
-                board.move(rook, 5, king.col)
-                board.move(king, 6, rook_col)
+            if (row, col - 1) and (row, col - 2) not in dangerous_squares:
+                board.move(rook, 7, 5)
+                board.move(king, 7, 6)
                 board.move_notation = "O-O"
             else:
                 return False
@@ -304,6 +301,6 @@ class Game(object):
     def detect_promotion(self, piece):
         # If a pawn reaches the other side of the board (any promotion square, let player choose how to promote)
         if isinstance(piece, Pawn):
-            if (piece.color == "White" and piece.col == 0) or (piece.color == "Black" and piece.col == 7):
+            if (piece.color == "White" and piece.row == 0) or (piece.color == "Black" and piece.row == 7):
                 return True
         return False
