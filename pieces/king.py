@@ -53,17 +53,19 @@ class King(Piece):
     # Castling
     if self.can_castle and not self.is_checked:
       # Queenside Castle
-      if all(board[self.row][self.col - i] == 0 for i in range(1, 4)) and \
-              isinstance(board[self.row][self.col - 4], Rook):
-        rook = board[self.row][self.col - 4]
-        if rook.can_castle:
-          moves.append((self.row, self.col - 2))
+      if self.col >= 4:  # Ensure enough space on the left
+        if all(board[self.row][self.col - i] == 0 for i in range(1, 4)) and \
+           isinstance(board[self.row][self.col - 4], Rook):
+          rook = board[self.row][self.col - 4]
+          if rook.can_castle:
+            moves.append((self.row, self.col - 2))
 
-    # Kingside Castle
-    if all(board[self.row][self.col + i] == 0 for i in range(1, 3)) and \
-            isinstance(board[self.row][self.col + 3], Rook):
-      rook = board[self.row][self.col + 3]
-      if rook.can_castle:
-        moves.append((self.row, self.col + 2))
+      # Kingside Castle
+      if self.col <= 3:  # Ensure enough space on the right
+        if all(board[self.row][self.col + i] == 0 for i in range(1, 3)) and \
+           isinstance(board[self.row][self.col + 3], Rook):
+          rook = board[self.row][self.col + 3]
+          if rook.can_castle:
+            moves.append((self.row, self.col + 2))
 
     return moves
