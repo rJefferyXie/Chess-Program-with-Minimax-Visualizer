@@ -11,6 +11,16 @@ from game.material import Material
 pygame.font.init()
 
 
+PIECE_IMAGES = {
+    "Pawn": (pawns[0], pawns[1]),
+    "Knight": (knights[0], knights[1]),
+    "Bishop": (bishops[0], bishops[1]),
+    "Rook": (rooks[0], rooks[1]),
+    "Queen": (queens[0], queens[1]),
+    "King": (kings[0], kings[1])
+}
+
+
 class Board(object):
   def __init__(self, player_color):
     self.player_color = player_color
@@ -124,42 +134,9 @@ class Board(object):
     for row in board.board:
       for piece in row:
         if isinstance(piece, (Pawn, Knight, Bishop, Rook, Queen, King)):
-          if piece.color == "Black":
-            if isinstance(piece, Pawn):
-              piece.draw(window, pawns[1])
-
-            elif isinstance(piece, Knight):
-              piece.draw(window, knights[1])
-
-            elif isinstance(piece, Bishop):
-              piece.draw(window, bishops[1])
-
-            elif isinstance(piece, Rook):
-              piece.draw(window, rooks[1])
-
-            elif isinstance(piece, Queen):
-              piece.draw(window, queens[1])
-
-            elif isinstance(piece, King):
-              piece.draw(window, kings[1])
-          else:
-            if isinstance(piece, Pawn):
-              piece.draw(window, pawns[0])
-
-            elif isinstance(piece, Knight):
-              piece.draw(window, knights[0])
-
-            elif isinstance(piece, Bishop):
-              piece.draw(window, bishops[0])
-
-            elif isinstance(piece, Rook):
-              piece.draw(window, rooks[0])
-
-            elif isinstance(piece, Queen):
-              piece.draw(window, queens[0])
-
-            elif isinstance(piece, King):
-              piece.draw(window, kings[0])
+          piece_image = PIECE_IMAGES[type(piece).__name__]
+          image = piece_image[0] if piece.color == "White" else piece_image[1]
+          piece.draw(window, image)
 
   def promotion_menu(self, color, window):
     if color == "White":
@@ -170,24 +147,11 @@ class Board(object):
         queens[1], rooks[1], bishops[1], knights[1], window)
 
   def draw_promotion_window(self, queen, rook, bishop, knight, window):
-    # Queen
-    pygame.draw.rect(window, light_gray, (540, 180, square_size, square_size))
-    window.blit(queen, (540, 180))
-
-    # Rook
-    pygame.draw.rect(window, light_gray, (540 + square_size,
-                     180, square_size, square_size))
-    window.blit(rook, (540 + square_size, 180))
-
-    # Bishop
-    pygame.draw.rect(window, light_gray, (540, 180 +
-                     square_size, square_size, square_size))
-    window.blit(bishop, (540, 180 + square_size))
-
-    # Knight
-    pygame.draw.rect(window, light_gray, (540 + square_size,
-                     180 + square_size, square_size, square_size))
-    window.blit(knight, (540 + square_size, 180 + square_size))
+    for i, piece in enumerate([queen, rook, bishop, knight]):
+      pygame.draw.rect(window, light_gray, (540 + i % 2 * square_size,
+                                            180 + i // 2 * square_size, square_size, square_size))
+      window.blit(piece, (540 + i % 2 * square_size,
+                          180 + i // 2 * square_size))
 
   def draw_theme_window(self, window):
     # Blue
@@ -201,45 +165,18 @@ class Board(object):
 
   def draw_game_buttons(self, window, theme):
     my_font = pygame.font.SysFont("calibri", 13)
+    buttons = [
+        ("Resign/Quit", (483, 328, 74, 39), (485, 330, 70, 35)),
+        ("Visualize AI", (563, 328, 74, 39), (565, 330, 70, 35)),
+        ("Speed", (563, 373, 74, 39), (565, 375, 70, 35)),
+        ("Highlight Valid Moves", (643, 328, 74, 39), (645, 330, 70, 35))
+      ]
 
-    # Resign Button
-    new_game = my_font.render("Resign/Quit", True, (0, 0, 0))
-    pygame.draw.rect(window, [0, 0, 0], (483, 328, 74, 39))
-    pygame.draw.rect(window, [255, 255, 255], (485, 330, 70, 35))
-    window.blit(new_game, (488, 340))
-
-    # Visualize AI Button
-    show_thinking = my_font.render("Visualize AI", True, (0, 0, 0))
-    pygame.draw.rect(window, [0, 0, 0], (563, 328, 74, 39))
-    if self.show_AI_calculations:
-      pygame.draw.rect(window, theme[1], (565, 330, 70, 35))
-    else:
-      pygame.draw.rect(window, [255, 255, 255], (565, 330, 70, 35))
-    window.blit(show_thinking, (570, 340))
-
-    # Visualize AI Speed Button
-    speed = my_font.render(self.AI_speed, True, (0, 0, 0))
-    pygame.draw.rect(window, [0, 0, 0], (563, 373, 74, 39))
-    if self.show_AI_calculations:
-      pygame.draw.rect(window, theme[1], (565, 375, 70, 35))
-    else:
-      pygame.draw.rect(window, [255, 255, 255], (565, 375, 70, 35))
-
-    if self.AI_speed == "Medium":
-      window.blit(speed, (579, 386))
-    else:
-      window.blit(speed, (588, 386))
-
-    # Highlight Valid Moves
-    show_valid_moves1 = my_font.render("Highlight", True, (0, 0, 0))
-    show_valid_moves2 = my_font.render("Valid Moves", True, (0, 0, 0))
-    pygame.draw.rect(window, [0, 0, 0], (643, 328, 74, 39))
-    if self.show_valid_moves:
-      pygame.draw.rect(window, theme[1], (645, 330, 70, 35))
-    else:
-      pygame.draw.rect(window, [255, 255, 255], (645, 330, 70, 35))
-    window.blit(show_valid_moves1, (655, 332))
-    window.blit(show_valid_moves2, (648, 350))
+    for label, button_rect, draw_rect in buttons:
+      text = my_font.render(label, True, (0, 0, 0))
+      pygame.draw.rect(window, [0, 0, 0], button_rect)
+      pygame.draw.rect(window, [255, 255, 255], draw_rect)
+      window.blit(text, (draw_rect[0] + 3, draw_rect[1] + 10))
 
   def draw_valid_moves(self, moves, window):
     for move in moves:
@@ -248,32 +185,13 @@ class Board(object):
 
   def draw_previous_move(self, window):
     if self.previous_move is not None:
-      # Previous Square
-      prev_row = self.previous_move[0][0]
-      prev_col = self.previous_move[0][1]
-      self.draw_move_square(prev_col, prev_row, [21, 35, 230], window)
-
-      # New Square
-      new_row = self.previous_move[1][0]
-      new_col = self.previous_move[1][1]
-      self.draw_move_square(new_col, new_row, [21, 35, 230], window)
+      for move in self.previous_move:
+        row, col = move
+        self.draw_move_square(col, row, [21, 35, 230], window)
 
   def draw_move_square(self, row, col, color, window):
-    # Top line
-    pygame.draw.line(window, color, (row * square_size, col * square_size),
-                     (row * square_size + square_size, col * square_size), 2)
-
-    # Bottom Line
-    pygame.draw.line(window, color, (row * square_size, col * square_size + square_size),
-                     (row * square_size + square_size, col * square_size + square_size), 2)
-
-    # Left Line
-    pygame.draw.line(window, color, (row * square_size, col * square_size),
-                     (row * square_size, col * square_size + square_size), 2)
-
-    # Right Line
-    pygame.draw.line(window, color, (row * square_size + square_size, col * square_size),
-                     (row * square_size + square_size, col * square_size + square_size), 2)
+    pygame.draw.rect(window, color, (row * square_size, col *
+                     square_size, square_size + 1, square_size + 1), 2)
 
   def get_all_pieces(self, color):
     pieces = []
