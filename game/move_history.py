@@ -2,39 +2,15 @@ import pygame
 
 pygame.font.init()
 my_font = pygame.font.SysFont("calibri", 15)
-letters = ["a", "b", "c", "d", "e", "f", "g", "h"]
 
 
 class MoveHistory(object):
     def __init__(self):
         self.move_log = []
+        self.letters = ["a", "b", "c", "d", "e", "f", "g", "h"]
 
-    def get_file(self, row):
-        if row == 0:
-            return "a"
-
-        elif row == 1:
-            return "b"
-
-        elif row == 2:
-            return "c"
-
-        elif row == 3:
-            return "d"
-
-        elif row == 4:
-            return "e"
-
-        elif row == 5:
-            return "f"
-
-        elif row == 6:
-            return "g"
-
-        elif row == 7:
-            return "h"
-        else:
-            pass
+    def get_file(self, col):            
+        return self.letters[col]
 
     def draw_move_log(self, window):
         # Draw First 50 Moves
