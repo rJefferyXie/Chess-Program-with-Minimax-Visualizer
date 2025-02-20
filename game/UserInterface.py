@@ -1,4 +1,5 @@
 import tkinter as tk
+from PIL import Image, ImageTk
 import pygame
 from game.constants import width, height, square_size, themes
 from game.game import Game
@@ -58,8 +59,8 @@ class SinglePlayer(object):
         self.root.configure(background="lightskyblue")
         self.root.title = "Single Player Chess"
         position_window(self.root)
-        self.white_king_image = tk.PhotoImage(file="pieces/assets/White_King.png")
-        self.black_king_image = tk.PhotoImage(file="pieces/assets/Black_King.png")
+        self.white_king_image = ImageTk.PhotoImage(Image.open("pieces/assets/White_King.png"))
+        self.black_king_image = ImageTk.PhotoImage(Image.open("pieces/assets/Black_King.png"))
         self.difficulty = tk.StringVar(self.root)
         self.color = ""
         self.create_window()
@@ -223,12 +224,12 @@ def single_player_game(color, theme, depth):
         if chess_game.turn == chess_game.computer.color \
                 and not chess_game.human.promoting and not chess_game.game_over():
             if chess_game.computer.color == "White":
-                value, board = chess_game.computer.minimax(chess_game.board, chess_game,
+                _, move = chess_game.computer.minimax(chess_game.board, chess_game,
                                                            depth, float("-inf"), float("inf"), "White")
             else:
-                value, board = chess_game.computer.minimax(chess_game.board, chess_game,
+                _, move = chess_game.computer.minimax(chess_game.board, chess_game,
                                                            depth, float("-inf"), float("inf"), "Black")
-            chess_game.computer.computer_move(chess_game, board)
+            chess_game.computer.computer_move(chess_game, move)
 
         if chess_game.game_over():
             draw_end_screen(chess_game, game_window)
