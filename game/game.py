@@ -18,6 +18,8 @@ class Game(object):
     self.theme = theme
     self.move_history = MoveHistory()
     self.human = Human(player_color, self)
+    self.board = Board(player_color)
+    self.computer = Computer("Black" if player_color == "White" else "White")
     self.turn = "White"
 
     # Game Over Conditions
@@ -28,18 +30,9 @@ class Game(object):
     self.insufficient_material_draw = False
     self.resign = False
 
-    if player_color == "White":
-      self.board = Board("White")
-      self.computer = Computer("Black")
-    else:
-      self.board = Board("Black")
-      self.computer = Computer("White")
-
   def game_over(self):
-    if self.checkmate_win or self.stalemate_draw or self.threefold_draw or \
-            self.no_captures_50 or self.insufficient_material_draw or self.resign:
-      return True
-    return False
+    return any([self.checkmate_win, self.stalemate_draw, self.threefold_draw,
+                self.no_captures_50, self.insufficient_material_draw, self.resign])
 
   def update_screen(self, valid_moves, board):
     # Draw Board
@@ -103,8 +96,7 @@ class Game(object):
       for piece in row:
         if isinstance(piece, (Pawn, Knight, Bishop, Rook, Queen, King)):
           if piece.color != self.turn:
-            for move in piece.valid_moves:
-              dangerous_squares.append(move)
+            dangerous_squares.extend(piece.valid_moves)
 
     return dangerous_squares
 
@@ -115,11 +107,10 @@ class Game(object):
     king_pos = (None, None)
     for row in self.board.board:
       for piece in row:
-        if isinstance(piece, King):
-          if piece.color == self.turn:
-            king = piece
-            king_pos = (piece.row, piece.col)
-            break
+        if isinstance(piece, King) and piece.color == self.turn:
+          king_pos = (piece.row, piece.col)
+          king = piece
+          break
 
     if king_pos in dangerous_squares:
       king.is_checked = True
@@ -133,57 +124,49 @@ class Game(object):
       for piece in row:
 
         # Get all pieces that are the same color as the king in check
-        if isinstance(piece, (Pawn, Knight, Bishop, Rook, Queen, King)):
-          if piece.color == self.turn:
-            prev_row = piece.row
-            prev_col = piece.col
+        if isinstance(piece, (Pawn, Knight, Bishop, Rook, Queen, King)) and piece.color == self.turn:
+          prev_row, prev_col = piece.row, piece.col
 
-            # Try all the moves available for each piece to see if they can escape check
-            for move in piece.valid_moves:
-              target = self.board.board[move[0]][move[1]]
+          # Try all the moves available for each piece to see if they can escape check
+          for move in piece.valid_moves:
+            target = self.board.board[move[0]][move[1]]
 
-              # If capturing an enemy piece
-              if isinstance(target, (Pawn, Knight, Bishop, Rook, Queen, King)):
-                if target.color != self.turn:
-                  self.board.board[move[0]][move[1]] = 0
-                  self.board.move(piece, move[0], move[1])
+            # If capturing an enemy piece
+            if isinstance(target, (Pawn, Knight, Bishop, Rook, Queen, King)) and target.color != self.turn:
+              self.board.board[move[0]][move[1]] = 0
+              self.board.move(piece, move[0], move[1])
 
-                  # If king is still checked, undo move and go next
-                  if self.king_checked():
-                    self.board.move(piece, prev_row, prev_col)
-                    self.board.board[move[0]][move[1]] = target
+              # If king is still checked, undo move and go next
+              if self.king_checked():
+                self.board.move(piece, prev_row, prev_col)
+                self.board.board[move[0]][move[1]] = target
 
-                  # If king is no longer checked, then there is no checkmate yet
-                  else:
-                    self.board.move(piece, prev_row, prev_col)
-                    self.board.board[move[0]][move[1]] = target
-                    return False
-
-              # If moving to an empty square
+              # If king is no longer checked, then there is no checkmate yet
               else:
-                self.board.move(piece, move[0], move[1])
+                self.board.move(piece, prev_row, prev_col)
+                self.board.board[move[0]][move[1]] = target
+                return False
 
-                # If king is still checked, undo move and go next
-                if self.king_checked():
-                  self.board.move(piece, prev_row, prev_col)
+            # If moving to an empty square
+            else:
+              self.board.move(piece, move[0], move[1])
 
-                # If king is no longer checked, then there is no checkmate yet
-                else:
-                  self.board.move(piece, prev_row, prev_col)
-                  return False
+              # If king is still checked, undo move and go next
+              if self.king_checked():
+                self.board.move(piece, prev_row, prev_col)
+
+              # If king is no longer checked, then there is no checkmate yet
+              else:
+                self.board.move(piece, prev_row, prev_col)
+                return False
 
     self.update_screen(self.human.valid_moves, self.board)
     self.checkmate_win = True
 
   def threefold_repetition(self):
-    unique_moves = set()
-
-    if len(self.move_history.move_log) > 9:
-      for i in range(-1, -10, -1):
-        move = self.move_history.move_log[i]
-        unique_moves.add(move)
-
-    if len(unique_moves) == 4:
+    # Check for threefold repetition in the move history
+    unique_moves = set(self.move_history.move_log[-9:])
+    if len(self.move_history.move_log) > 9 and len(unique_moves) == 4:
       self.update_screen(self.human.valid_moves, self.board)
       self.threefold_draw = True
 
@@ -194,24 +177,19 @@ class Game(object):
     for row in self.board.board:
       for piece in row:
         # Get all pieces that are the same color as the current player's team
-        if isinstance(piece, (Pawn, Knight, Bishop, Rook, Queen, King)):
-          if piece.color == self.turn:
+        if isinstance(piece, (Pawn, Knight, Bishop, Rook, Queen, King)) and piece.color == self.turn:
 
-            # Go through all possible moves to see if any are legal
-            if isinstance(piece, King):
-              for move in piece.valid_moves:
-                if move not in dangerous_squares:
-                  all_valid_moves.append(move)
-            else:
-              for move in piece.valid_moves:
+          # Go through all possible moves to see if any are legal
+          if isinstance(piece, King):
+            for move in piece.valid_moves:
+              if move not in dangerous_squares:
                 all_valid_moves.append(move)
-
-        # If there was a legal move, there is no stalemate yet
-        if len(all_valid_moves) > 0:
-          return False
+          else:
+            for move in piece.valid_moves:
+              all_valid_moves.append(move)
 
     # If there were no legal moves for the current player, its a stalemate
-    if len(all_valid_moves) == 0:
+    if not all_valid_moves:
       self.update_screen(self.human.valid_moves, self.board)
       self.stalemate_draw = True
 
@@ -223,10 +201,8 @@ class Game(object):
         self.no_captures_50 = True
 
   def insufficient_material(self):
-    white_pieces = {"Knights": 0,
-                    "Bishops": 0}
-    black_pieces = {"Knights": 0,
-                    "Bishops": 0}
+    white_material = {"Knights": 0, "Bishops": 0}
+    black_material = {"Knights": 0, "Bishops": 0}
 
     for row in self.board.board:
       for piece in row:
@@ -235,27 +211,17 @@ class Game(object):
         if isinstance(piece, (Pawn, Rook, Queen)):
           return False
 
-        # Count number of knights on board
-        elif isinstance(piece, Knight):
-          if piece.color == "White":
-            white_pieces["Knights"] += 1
-          else:
-            black_pieces["Knights"] += 1
+        if isinstance(piece, Knight):
+          white_material["Knights"] += 1 if piece.color == "White" else 0
+          black_material["Knights"] += 1 if piece.color == "Black" else 0
+        if isinstance(piece, Bishop):
+          white_material["Bishops"] += 1 if piece.color == "White" else 0
+          black_material["Bishops"] += 1 if piece.color == "Black" else 0
 
-        # Count number of bishops on board
-        elif isinstance(piece, Bishop):
-          if piece.color == "Black":
-            black_pieces["Bishops"] += 1
-          else:
-            white_pieces["Bishops"] += 1
+    white_pieces = sum(white_material.values())
+    black_pieces = sum(black_material.values())
 
-    white_material_remaining = white_pieces["Knights"] + \
-        white_pieces["Bishops"]
-    black_material_remaining = black_pieces["Knights"] + \
-        black_pieces["Bishops"]
-
-    # In the best case, there is a King + Knight or King + Bishop for either side (still a draw).
-    if white_material_remaining * 3 <= 3 and black_material_remaining * 3 <= 3:
+    if white_pieces * 3 <= 3 and black_pieces * 3 <= 3:
       self.update_screen(self.human.valid_moves, self.board)
       self.insufficient_material_draw = True
 
@@ -268,18 +234,13 @@ class Game(object):
 
   def change_turn(self):
     self.human.valid_moves = []
-    if self.turn == "White":
-      self.turn = "Black"
-    else:
-      self.turn = "White"
+    self.turn = "Black" if self.turn == "White" else "White"
 
   def capture(self, piece):
     if piece.color == "Black":
-      self.board.material.add_to_captured_pieces(
-        piece, self.board.material.captured_black_pieces)
+      self.board.material.add_to_captured_pieces(piece, self.board.material.captured_black_pieces)
     if piece.color == "White":
-      self.board.material.add_to_captured_pieces(
-        piece, self.board.material.captured_white_pieces)
+      self.board.material.add_to_captured_pieces(piece, self.board.material.captured_white_pieces)
 
   def castle(self, king, rook, row, col, dangerous_squares, board):
     # Long Castle
