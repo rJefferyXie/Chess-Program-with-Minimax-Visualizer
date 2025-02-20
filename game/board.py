@@ -29,6 +29,7 @@ class Board(object):
     self.show_valid_moves = True
     self.show_AI_calculations = False
     self.AI_speed = "Fast"
+    self.stored_moves = []
     self.previous_move = None
     self.prev_square = None
     self.piece = None
@@ -164,19 +165,46 @@ class Board(object):
     window.blit(images[2], (640, 115))
 
   def draw_game_buttons(self, window, theme):
-    my_font = pygame.font.SysFont("calibri", 13)
-    buttons = [
-        ("Resign/Quit", (483, 328, 74, 39), (485, 330, 70, 35)),
-        ("Visualize AI", (563, 328, 74, 39), (565, 330, 70, 35)),
-        ("Speed", (563, 373, 74, 39), (565, 375, 70, 35)),
-        ("Highlight Valid Moves", (643, 328, 74, 39), (645, 330, 70, 35))
-      ]
+      my_font = pygame.font.SysFont("calibri", 13)
 
-    for label, button_rect, draw_rect in buttons:
-      text = my_font.render(label, True, (0, 0, 0))
-      pygame.draw.rect(window, [0, 0, 0], button_rect)
-      pygame.draw.rect(window, [255, 255, 255], draw_rect)
-      window.blit(text, (draw_rect[0] + 3, draw_rect[1] + 10))
+      # Resign Button
+      new_game = my_font.render("Resign/Quit", True, (0, 0, 0))
+      pygame.draw.rect(window, [0, 0, 0], (483, 328, 74, 39))
+      pygame.draw.rect(window, [255, 255, 255], (485, 330, 70, 35))
+      window.blit(new_game, (488, 340))
+
+      # Visualize AI Button
+      show_thinking = my_font.render("Visualize AI", True, (0, 0, 0))
+      pygame.draw.rect(window, [0, 0, 0], (563, 328, 74, 39))
+      if self.show_AI_calculations:
+          pygame.draw.rect(window, theme[1], (565, 330, 70, 35))
+      else:
+          pygame.draw.rect(window, [255, 255, 255], (565, 330, 70, 35))
+      window.blit(show_thinking, (570, 340))
+
+      # Visualize AI Speed Button
+      speed = my_font.render(self.AI_speed, True, (0, 0, 0))
+      pygame.draw.rect(window, [0, 0, 0], (563, 373, 74, 39))
+      if self.show_AI_calculations:
+          pygame.draw.rect(window, theme[1], (565, 375, 70, 35))
+      else:
+          pygame.draw.rect(window, [255, 255, 255], (565, 375, 70, 35))
+
+      if self.AI_speed == "Medium":
+          window.blit(speed, (579, 386))
+      else:
+          window.blit(speed, (588, 386))
+
+      # Highlight Valid Moves
+      show_valid_moves1 = my_font.render("Highlight", True, (0, 0, 0))
+      show_valid_moves2 = my_font.render("Valid Moves", True, (0, 0, 0))
+      pygame.draw.rect(window, [0, 0, 0], (643, 328, 74, 39))
+      if self.show_valid_moves:
+          pygame.draw.rect(window, theme[1], (645, 330, 70, 35))
+      else:
+          pygame.draw.rect(window, [255, 255, 255], (645, 330, 70, 35))
+      window.blit(show_valid_moves1, (655, 332))
+      window.blit(show_valid_moves2, (648, 350))
 
   def draw_valid_moves(self, moves, window):
     for move in moves:
