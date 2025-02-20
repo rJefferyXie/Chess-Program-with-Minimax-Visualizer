@@ -1,5 +1,4 @@
 import pygame
-from copy import deepcopy
 from pieces import pawn, knight, bishop, rook, queen, king
 import time
 from functools import wraps
@@ -36,9 +35,9 @@ def print_profile_summary():
 
     if func_name == "simulate_move":
       print(f"{func_name}: Evaluated {call_count} moves in {total_time:.3f} seconds.")
-    elif func_name == "get_all_positions":
+    elif func_name == "get_all_moves":
       print(
-        f"{func_name}: Generated {call_count} positions in {total_time:.3f} seconds.")
+        f"{func_name}: Generated {call_count} moves in {total_time:.3f} seconds.")
     elif func_name == "evaluate_board":
       print(
         f"{func_name}: Evaluated the board {call_count} times in {total_time:.3f} seconds.")
@@ -86,24 +85,27 @@ class Computer(object):
     if depth == 0 or game.game_over():
       return self.evaluate_board(board), board
 
-    best_position = None
+    best_move = None
     best_score = float("-inf") if max_player == self.WHITE else float("inf")
     other_player = self.BLACK if max_player == self.WHITE else self.WHITE
 
-    for position in self.get_all_positions(board, game, max_player):
-      current_score, _ = self.minimax(
-        position, game, depth - 1, alpha, beta, other_player)
+    all_moves = self.get_all_moves(board, game, max_player)
+    for piece, move in all_moves:
+      position = self.simulate_move(piece, board, game, move, max_player)
+      self.draw_AI_calculations(game, piece, position)
+      current_score, _ = self.minimax(position, game, depth - 1, alpha, beta, other_player)
+      self.undo_move(board, game)
 
       if max_player == self.WHITE:
         if current_score > best_score:
           best_score = current_score
-          best_position = position
+          best_move = (piece, move)
           alpha = max(alpha, best_score)
 
       if max_player == self.BLACK:
         if current_score < best_score:
           best_score = current_score
-          best_position = position
+          best_move = (piece, move)
           beta = min(beta, best_score)
 
       # if beta <= alpha, it means that the maximizing player already has a move with a better outcome than the current branch's best possible outcome
@@ -112,7 +114,7 @@ class Computer(object):
       if beta <= alpha:
         break
 
-    return best_score, best_position
+    return best_score, best_move
 
   def get_piece_value(self, piece):
     """
@@ -146,15 +148,15 @@ class Computer(object):
     return position_eval
 
   @profile_function
-  def get_all_positions(self, board, game, color):
+  def get_all_moves(self, board, game, color):
     """
-    Generates all possible positions after simulating the valid moves for each piece that the player owns.
+    Generates all possible moves for each piece that the player owns.
     """
-    all_positions = []
-    passive_positions = []
-    positions_with_capture = []
+    all_moves = []
+    passive_moves = []
+    moves_with_capture = []
 
-    # for each piece that the current player controls, simulate every possible move and save the new position in positions
+    # for each piece that the current player controls, get all valid moves and add them to result
     for piece in board.get_all_pieces(color):
       if isinstance(piece, pawn.Pawn):
         piece.update_valid_moves(board.board, game.move_history.move_log)
@@ -162,30 +164,24 @@ class Computer(object):
         piece.update_valid_moves(board.board)
 
       for move in piece.valid_moves:
-        # need to create a deep copy so we don't modify the original board when simulating the move
-        board_copy = deepcopy(board)
-        temp_piece = board_copy.get_piece(piece.row, piece.col)
-        new_temp_position, did_capture_piece = self.simulate_move(
-          temp_piece, board_copy, game, move, color)
-
-        if did_capture_piece:
-          positions_with_capture.append(new_temp_position)
+        if board.board[move[0]][move[1]] != 0:
+          moves_with_capture.append((piece, move))
         else:
-          passive_positions.append(new_temp_position)
+          passive_moves.append((piece, move))
 
-        if game.board.show_AI_calculations:
-          self.draw_AI_calculations(game, piece, new_temp_position)
-
-    # by using move ordering and putting positions where the AI captured a piece first, we evaluate the moves
+    # by using move ordering and putting moves where the AI captured a piece first, we evaluate the moves
     # that are likely to be the strongest earlier in the search tree, making alpha-beta pruning more efficient.
-    all_positions.extend(positions_with_capture)
-    all_positions.extend(passive_positions)
-    return all_positions
+    all_moves.extend(moves_with_capture)
+    all_moves.extend(passive_moves)
+    return all_moves
 
   def draw_AI_calculations(self, game, piece, board):
     """
     If the user has enabled the visualize AI feature, show the current position that the AI is considering after every move.
     """
+    if not game.board.show_AI_calculations:
+      return
+    
     if game.board.AI_speed == "Medium":
       pygame.time.delay(20)
     elif game.board.AI_speed == "Slow":
@@ -198,13 +194,22 @@ class Computer(object):
     """
     Simulates a move on a copy of the board.
     """
-    did_capture_piece = False
+    # Store the current state for undoing later
+    prev_square = (piece.row, piece.col)
     target = board.get_piece(move[0], move[1])
+
+    # Save state for undoing the move
+    board.stored_moves.append({
+      'piece': piece,
+      'from': prev_square,
+      'to': move,
+      'captured': target,
+      'can_castle': piece.can_castle if isinstance(piece, (king.King, rook.Rook)) else None,
+    })
 
     board.prev_square = (piece.row, piece.col)
     board.piece = piece
     board.target = (move[0], move[1])
-    board.did_capture_piece = target
 
     # simulating a castling move
     if isinstance(piece, king.King) and isinstance(target, rook.Rook) and piece.color == target.color:
@@ -214,14 +219,12 @@ class Computer(object):
       if target != 0 and target.color != color:  # simulating capturing opponents piece
         board.board[move[0]][move[1]] = 0
         board.captured_piece = target
-        did_capture_piece = True
 
       board.move(piece, move[0], move[1])
 
       if game.detect_promotion(piece):
         # for simplicity, the computer will always promote to a queen
-        board.board[piece.row][piece.col] = queen.Queen(
-          piece.row, piece.col, piece.color)
+        board.board[piece.row][piece.col] = queen.Queen(piece.row, piece.col, piece.color)
 
       # after a rook or king moves, it can no longer castle
       if isinstance(piece, (rook.Rook, king.King)):
@@ -232,16 +235,48 @@ class Computer(object):
       board.hash = self.zobrist.calculate_hash(board)
 
     # Update the Zobrist hash
-    board.hash = self.zobrist.update_hash(
-      board.hash, piece, board.prev_square, board.target)
+    board.hash = self.zobrist.update_hash(board.hash, piece, board.prev_square, board.target)
 
-    return board, did_capture_piece
+    return board
+
+  def undo_move(self, board, game):
+    # Restore previous move data
+    move_data = board.stored_moves.pop()
+    piece = move_data['piece']
+    from_square = move_data['from']
+    to_square = move_data['to']
+    captured_piece = move_data['captured']
+    can_castle = move_data['can_castle']
+
+    # Revert the piece's position
+    board.move(piece, from_square[0], from_square[1])
+
+    # Restore the captured piece, if any
+    if captured_piece:
+      board.board[to_square[0]][to_square[1]] = captured_piece
+
+    # If the piece was promoted, we need to undo the promotion
+    if isinstance(piece, queen.Queen) and game.detect_promotion(piece):
+      # Revert to the original piece type, e.g., a pawn, or revert promotion (if needed)
+      original_piece = pawn.Pawn(from_square[0], from_square[1], piece.color)  # Assuming it was a pawn
+      board.board[from_square[0]][from_square[1]] = original_piece
+
+    # Restore the castling ability for rook or king if it was altered
+    if isinstance(piece, (king.King, rook.Rook)) and can_castle is not None:
+      piece.can_castle = can_castle
+
+    # Revert Zobrist hash
+    board.hash = self.zobrist.update_hash(board.hash, piece, to_square, from_square)
+
+    # Clear the stored AI move after undoing
+    board.stored_AI_move = None
 
   def draw_moves(self, piece, game, board):
     valid_moves = piece.valid_moves
     game.update_screen(valid_moves, board)
 
-  def computer_move(self, game, board):
+  def computer_move(self, game, move):
+    board = self.simulate_move(move[0], game.board, game, move[1], self.color)
     game.board.board = board.board
 
     if isinstance(board.piece, pawn.Pawn):
