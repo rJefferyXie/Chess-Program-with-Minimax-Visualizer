@@ -254,6 +254,7 @@ class Computer(object):
     # Restore the captured piece, if any
     if captured_piece:
       board.board[to_square[0]][to_square[1]] = captured_piece
+      board.captured_piece = 0
 
     # If the piece was promoted, we need to undo the promotion
     if isinstance(piece, queen.Queen) and game.detect_promotion(piece):
@@ -267,9 +268,6 @@ class Computer(object):
 
     # Revert Zobrist hash
     board.hash = self.zobrist.update_hash(board.hash, piece, to_square, from_square)
-
-    # Clear the stored AI move after undoing
-    board.stored_AI_move = None
 
   def draw_moves(self, piece, game, board):
     valid_moves = piece.valid_moves
