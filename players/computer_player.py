@@ -266,10 +266,10 @@ class Computer(object):
     if isinstance(piece, king.King) and abs(to_square[1] - from_square[1]) == 2:
       rook_col = 0 if to_square[1] < from_square[1] else 7
       rook_new_col = 3 if to_square[1] < from_square[1] else 5  # Where the rook moved
-      rook = board.get_piece(from_square[0], rook_new_col)
+      rook_piece = board.get_piece(from_square[0], rook_new_col)
 
-      if isinstance(rook, rook.Rook):
-        board.move(rook, from_square[0], rook_col)  # Move rook back
+      if isinstance(rook_piece, rook.Rook):
+        board.move(rook_piece, from_square[0], rook_col)  # Move rook back
 
     # Restore the castling ability for rook or king if it was altered
     if isinstance(piece, (king.King, rook.Rook)) and can_castle is not None:
