@@ -261,6 +261,15 @@ class Computer(object):
       # Revert to the original piece type, e.g., a pawn, or revert promotion (if needed)
       original_piece = pawn.Pawn(from_square[0], from_square[1], piece.color)  # Assuming it was a pawn
       board.board[from_square[0]][from_square[1]] = original_piece
+      
+    # Undo castling if applicable
+    if isinstance(piece, king.King) and abs(to_square[1] - from_square[1]) == 2:
+      rook_col = 0 if to_square[1] < from_square[1] else 7
+      rook_new_col = 3 if to_square[1] < from_square[1] else 5  # Where the rook moved
+      rook = board.get_piece(from_square[0], rook_new_col)
+
+      if isinstance(rook, rook.Rook):
+        board.move(rook, from_square[0], rook_col)  # Move rook back
 
     # Restore the castling ability for rook or king if it was altered
     if isinstance(piece, (king.King, rook.Rook)) and can_castle is not None:
