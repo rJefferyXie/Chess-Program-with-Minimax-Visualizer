@@ -163,11 +163,11 @@ class Computer(object):
       else:
         piece.update_valid_moves(board.board)
 
-      for move in piece.valid_moves:
-        if board.board[move[0]][move[1]] != 0:
-          moves_with_capture.append((piece, move))
+      for row, col in piece.valid_moves:
+        if board.board[row][col] != 0 and board.get_piece(row, col).color != color:
+          moves_with_capture.append((piece, (row, col)))
         else:
-          passive_moves.append((piece, move))
+          passive_moves.append((piece, (row, col)))
 
     # by using move ordering and putting moves where the AI captured a piece first, we evaluate the moves
     # that are likely to be the strongest earlier in the search tree, making alpha-beta pruning more efficient.
@@ -194,41 +194,39 @@ class Computer(object):
     """
     Simulates a move on a copy of the board.
     """
-    # Store the current state for undoing later
-    prev_square = (piece.row, piece.col)
     target = board.get_piece(move[0], move[1])
-
-    # Save state for undoing the move
-    board.stored_moves.append({
-      'piece': piece,
-      'from': prev_square,
-      'to': move,
-      'captured': target,
-      'can_castle': piece.can_castle if isinstance(piece, (king.King, rook.Rook)) else None,
-    })
 
     board.prev_square = (piece.row, piece.col)
     board.piece = piece
     board.target = (move[0], move[1])
 
+    # Save state for undoing the move
+    board.stored_moves.append({
+      'piece': piece,
+      'from': board.prev_square,
+      'to': move,
+      'captured': target,
+      'can_castle': getattr(piece, 'can_castle', None),
+    })
+
     # simulating a castling move
     if isinstance(piece, king.King) and isinstance(target, rook.Rook) and piece.color == target.color:
-      dangerous_squares = game.get_dangerous_squares()
-      game.castle(piece, target, move[0], move[1], dangerous_squares, board)
-    else:
-      if target != 0 and target.color != color:  # simulating capturing opponents piece
-        board.board[move[0]][move[1]] = 0
-        board.captured_piece = target
+      game.castle(piece, target, game.get_dangerous_squares(), board)
 
-      board.move(piece, move[0], move[1])
+    # simulating capturing opponents piece
+    if target != 0 and target.color != color:  
+      board.board[move[0]][move[1]] = 0
+      board.captured_piece = target
 
-      if game.detect_promotion(piece):
-        # for simplicity, the computer will always promote to a queen
-        board.board[piece.row][piece.col] = queen.Queen(piece.row, piece.col, piece.color)
+    board.move(piece, move[0], move[1])
 
-      # after a rook or king moves, it can no longer castle
-      if isinstance(piece, (rook.Rook, king.King)):
-        piece.can_castle = False
+    if game.detect_promotion(piece):
+      # for simplicity, the computer will always promote to a queen
+      board.board[piece.row][piece.col] = queen.Queen(piece.row, piece.col, piece.color)
+
+    # after a rook or king moves, it can no longer castle
+    if isinstance(piece, (rook.Rook, king.King)):
+      piece.can_castle = False
 
     # Initialize the hash if not already set
     if not board.hash:
@@ -256,13 +254,11 @@ class Computer(object):
       board.board[to_square[0]][to_square[1]] = captured_piece
       board.captured_piece = 0
 
-    # If the piece was promoted, we need to undo the promotion
+    # Undo any pawn promotion
     if isinstance(piece, queen.Queen) and game.detect_promotion(piece):
-      # Revert to the original piece type, e.g., a pawn, or revert promotion (if needed)
-      original_piece = pawn.Pawn(from_square[0], from_square[1], piece.color)  # Assuming it was a pawn
-      board.board[from_square[0]][from_square[1]] = original_piece
-      
-    # Undo castling if applicable
+      board.board[from_square[0]][from_square[1]] = pawn.Pawn(from_square[0], from_square[1], piece.color)
+
+    # Undo castling moves
     if isinstance(piece, king.King) and abs(to_square[1] - from_square[1]) == 2:
       rook_col = 0 if to_square[1] < from_square[1] else 7
       rook_new_col = 3 if to_square[1] < from_square[1] else 5  # Where the rook moved

@@ -242,26 +242,31 @@ class Game(object):
     if piece.color == "White":
       self.board.material.add_to_captured_pieces(piece, self.board.material.captured_white_pieces)
 
-  def castle(self, king, rook, row, col, dangerous_squares, board):
+  def castle(self, king, rook, dangerous_squares, board):
+    # Ensure the king and rook are eligible for castling
+    if not (king.can_castle and rook.can_castle):
+      return False
+
     # Long Castle
-    if row == 0:
-      if ((col + 1) and (row, col + 2) and (row, col + 3)) not in dangerous_squares:
-        board.move(rook, 0, 3)
-        board.move(king, 0, 2)
-        board.move_notation = "O-O-O"
-      else:
-        return False
+    if rook.col == 0:
+      for i in range(1, 4):
+        if (king.row, king.col - i) in dangerous_squares:
+          return False
+      board.move(rook, king.row, 3)
+      board.move(king, king.row, 2)
+      board.move_notation = "O-O-O"
 
     # Short Castle
-    elif row == 7:
-      if (row, col - 1) and (row, col - 2) not in dangerous_squares:
-        board.move(rook, 7, 5)
-        board.move(king, 7, 6)
-        board.move_notation = "O-O"
-      else:
-        return False
+    elif rook.col == 7:
+      for i in range(1, 3):
+        if (king.row, king.col + i) in dangerous_squares:
+          return False
+      board.move(rook, king.row, 5)
+      board.move(king, king.row, 6)
+      board.move_notation = "O-O"
 
     king.can_castle = False
+    rook.can_castle = False
     return True
 
   def detect_promotion(self, piece):

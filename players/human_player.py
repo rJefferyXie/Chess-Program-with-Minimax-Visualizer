@@ -84,7 +84,7 @@ class Human(object):
     # Player is trying to castle
     if isinstance(self.selected_piece, King) and isinstance(piece, Rook) and self.selected_piece.color == piece.color and (row, col) in self.valid_moves:
       dangerous_squares = self.game.get_dangerous_squares()
-      if self.game.castle(self.selected_piece, piece, row, col, dangerous_squares, self.game.board):
+      if self.game.castle(self.selected_piece, piece, dangerous_squares, self.game.board):
         move_str = self.game.board.move_notation
         move_str = self.game.move_creates_check(move_str)
         self.game.move_history.move_log.append(move_str)
@@ -164,18 +164,14 @@ class Human(object):
                 col) + str(abs(8 - row))
 
           else:
-            piece = self.game.board.board[self.selected_piece.row -
-                                          1][self.selected_piece.col]
+            piece = self.game.board.board[self.selected_piece.row - 1][self.selected_piece.col]
             if isinstance(piece, Pawn):
-              self.game.board.board[self.selected_piece.row -
-                                    1][self.selected_piece.col] = 0
+              self.game.board.board[self.selected_piece.row - 1][self.selected_piece.col] = 0
               self.game.capture(piece)
-              move_str = self.game.move_history.get_file(
-                col) + "x" + str(abs(8 - row))
+              move_str = self.game.move_history.get_file(col) + "x" + str(abs(8 - row))
 
             else:
-              move_str = self.game.move_history.get_file(
-                col) + str(abs(8 - row))
+              move_str = self.game.move_history.get_file(col) + str(abs(8 - row))
 
           if self.game.detect_promotion(self.selected_piece):
             self.promoting = True
