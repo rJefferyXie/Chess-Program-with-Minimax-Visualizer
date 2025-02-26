@@ -249,18 +249,22 @@ class Game(object):
 
     # Long Castle
     if rook.col == 0:
-      for i in range(1, 4):
-        if (king.row, king.col - i) in dangerous_squares:
-          return False
+      if any(board.get_piece(king.row, col) != 0 for col in [1, 2, 3]):
+        return False  # Pieces blocking the path
+      if any((king.row, col) in dangerous_squares for col in [2, 3, 4]):
+        return False  # Can't castle through check
+      
       board.move(rook, king.row, 3)
       board.move(king, king.row, 2)
       board.move_notation = "O-O-O"
 
     # Short Castle
     elif rook.col == 7:
-      for i in range(1, 3):
-        if (king.row, king.col + i) in dangerous_squares:
-          return False
+      if any(board.get_piece(king.row, col) != 0 for col in [5, 6]):
+        return False  # Pieces blocking the path
+      if any((king.row, col) in dangerous_squares for col in [4, 5, 6]):
+        return False  # Can't castle through check
+      
       board.move(rook, king.row, 5)
       board.move(king, king.row, 6)
       board.move_notation = "O-O"

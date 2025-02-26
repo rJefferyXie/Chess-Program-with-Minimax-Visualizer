@@ -212,17 +212,20 @@ class Computer(object):
     # simulating a castling move
     if isinstance(piece, king.King) and isinstance(target, rook.Rook) and piece.color == target.color:
       game.castle(piece, target, game.get_dangerous_squares(), board)
+      board.stored_moves[-1]['rook'] = target
+      board.stored_moves[-1]['rook_from'] = (move[0], move[1])
 
-    # simulating capturing opponents piece
-    if target != 0 and target.color != color:  
-      board.board[move[0]][move[1]] = 0
-      board.captured_piece = target
+    else:
+      # simulating capturing opponents piece
+      if target != 0 and target.color != color:  
+        board.board[move[0]][move[1]] = 0
+        board.captured_piece = target
 
-    board.move(piece, move[0], move[1])
+      board.move(piece, move[0], move[1])
 
-    if game.detect_promotion(piece):
-      # for simplicity, the computer will always promote to a queen
-      board.board[piece.row][piece.col] = queen.Queen(piece.row, piece.col, piece.color)
+      if game.detect_promotion(piece):
+        # for simplicity, the computer will always promote to a queen
+        board.board[piece.row][piece.col] = queen.Queen(piece.row, piece.col, piece.color)
 
     # after a rook or king moves, it can no longer castle
     if isinstance(piece, (rook.Rook, king.King)):
@@ -246,26 +249,26 @@ class Computer(object):
     captured_piece = move_data['captured']
     can_castle = move_data['can_castle']
 
+    # Undo castling moves
+    if isinstance(piece, king.King) and move_data.get('rook'):
+      rook_piece = move_data.get('rook')  # Retrieve stored rook
+      if rook_piece:
+        rook_from = move_data['rook_from']
+        
+        # Ensure the rook moves back to its original position
+        board.move(rook_piece, rook_from[0], rook_from[1])
+
     # Revert the piece's position
     board.move(piece, from_square[0], from_square[1])
 
     # Restore the captured piece, if any
-    if captured_piece:
+    if captured_piece and captured_piece.color != piece.color:
       board.board[to_square[0]][to_square[1]] = captured_piece
       board.captured_piece = 0
 
     # Undo any pawn promotion
     if isinstance(piece, queen.Queen) and game.detect_promotion(piece):
       board.board[from_square[0]][from_square[1]] = pawn.Pawn(from_square[0], from_square[1], piece.color)
-
-    # Undo castling moves
-    if isinstance(piece, king.King) and abs(to_square[1] - from_square[1]) == 2:
-      rook_col = 0 if to_square[1] < from_square[1] else 7
-      rook_new_col = 3 if to_square[1] < from_square[1] else 5  # Where the rook moved
-      rook_piece = board.get_piece(from_square[0], rook_new_col)
-
-      if isinstance(rook_piece, rook.Rook):
-        board.move(rook_piece, from_square[0], rook_col)  # Move rook back
 
     # Restore the castling ability for rook or king if it was altered
     if isinstance(piece, (king.King, rook.Rook)) and can_castle is not None:
