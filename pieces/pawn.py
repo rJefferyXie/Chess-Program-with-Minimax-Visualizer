@@ -64,7 +64,7 @@ class Pawn(Piece):
         if 0 <= new_col < 8:
           adjacent = board[self.row][new_col]
           if isinstance(adjacent, Pawn) and adjacent.color != self.color and adjacent.vulnerable_to_en_passant \
-          and new_col == self.get_row(move_log[-1][0]) and self.row == abs(int(move_log[-1][1]) - 8):
+          and new_col == self.get_row(move_log[-1][0]) and self.row == abs(int(move_log[-1][-1]) - 8):
             moves.append((self.row + move, new_col))
 
     return moves
