@@ -4,7 +4,6 @@ import time
 from functools import wraps
 from game.zobrist import ZobristHashing
 
-# Piece Evaluations from https://www.chessprogramming.org/Simplified_Evaluation_Function
 
 profile_data = {}
 
@@ -34,16 +33,13 @@ def print_profile_summary():
     call_count = data["call_count"]
 
     if func_name == "simulate_move":
-      print(f"{func_name}: Evaluated {call_count} moves in {total_time:.3f} seconds.")
+      print(f"{func_name}: Simulated {call_count} moves in {total_time:.3f} seconds.")
     elif func_name == "get_all_moves":
-      print(
-        f"{func_name}: Generated {call_count} moves in {total_time:.3f} seconds.")
+      print(f"{func_name}: Generated {call_count} moves in {total_time:.3f} seconds.")
     elif func_name == "evaluate_board":
-      print(
-        f"{func_name}: Evaluated the board {call_count} times in {total_time:.3f} seconds.")
+      print(f"{func_name}: Evaluated the board {call_count} times in {total_time:.3f} seconds.")
     elif func_name == "minimax":
-      print(
-        f"{func_name}: Completed {call_count} recursive calls in {total_time:.3f} seconds.")
+      print(f"{func_name}: Completed {call_count} recursive calls in {total_time:.3f} seconds.")
     else:
       print(f"{func_name}: Executed {call_count} times in {total_time:.3f} seconds.")
 
@@ -52,29 +48,28 @@ class Computer(object):
   WHITE = "White"
   BLACK = "Black"
 
-  PIECE_TYPES = (pawn.Pawn, knight.Knight, bishop.Bishop,
-                 rook.Rook, queen.Queen, king.King)
+  # Piece Evaluations from https://www.chessprogramming.org/Simplified_Evaluation_Function
+  PIECE_TYPES = (pawn.Pawn, knight.Knight, bishop.Bishop, rook.Rook, queen.Queen, king.King)
   PIECE_EVALUATION_TABLES = {
-      (WHITE, "Pawn"): (100, pawn.white_pawn_eval_table),
-      (WHITE, "Knight"): (320, knight.white_knight_eval_table),
-      (WHITE, "Bishop"): (330, bishop.white_bishop_eval_table),
-      (WHITE, "Rook"): (500, rook.white_rook_eval_table),
-      (WHITE, "Queen"): (900, queen.white_queen_eval_table),
-      (WHITE, "King"): (20000, king.white_king_eval_table),
+    (WHITE, "Pawn"): (100, pawn.white_pawn_eval_table),
+    (WHITE, "Knight"): (320, knight.white_knight_eval_table),
+    (WHITE, "Bishop"): (330, bishop.white_bishop_eval_table),
+    (WHITE, "Rook"): (500, rook.white_rook_eval_table),
+    (WHITE, "Queen"): (900, queen.white_queen_eval_table),
+    (WHITE, "King"): (20000, king.white_king_eval_table),
 
-      (BLACK, "Pawn"): (100, pawn.black_pawn_eval_table),
-      (BLACK, "Knight"): (320, knight.black_knight_eval_table),
-      (BLACK, "Bishop"): (330, bishop.black_bishop_eval_table),
-      (BLACK, "Rook"): (500, rook.black_rook_eval_table),
-      (BLACK, "Queen"): (900, queen.black_queen_eval_table),
-      (BLACK, "King"): (20000, king.black_king_eval_table),
+    (BLACK, "Pawn"): (100, pawn.black_pawn_eval_table),
+    (BLACK, "Knight"): (320, knight.black_knight_eval_table),
+    (BLACK, "Bishop"): (330, bishop.black_bishop_eval_table),
+    (BLACK, "Rook"): (500, rook.black_rook_eval_table),
+    (BLACK, "Queen"): (900, queen.black_queen_eval_table),
+    (BLACK, "King"): (20000, king.black_king_eval_table),
   }
 
   def __init__(self, color):
     self.color = color
     self.transposition_table = {}
-    self.zobrist = ZobristHashing(
-      8, 8, [ptype.__name__ for ptype in self.PIECE_TYPES], [self.WHITE, self.BLACK])
+    self.zobrist = ZobristHashing(8, 8, [ptype.__name__ for ptype in self.PIECE_TYPES], [self.WHITE, self.BLACK])
 
   @profile_function
   def minimax(self, board, game, depth, alpha, beta, max_player):
@@ -122,7 +117,6 @@ class Computer(object):
     """
     piece_key = (piece.color, type(piece).__name__)
     piece_material, piece_eval_table = self.PIECE_EVALUATION_TABLES[piece_key]
-
     return piece_material + piece_eval_table[piece.row][piece.col]
 
   @profile_function
@@ -169,11 +163,20 @@ class Computer(object):
         else:
           passive_moves.append((piece, (row, col)))
 
+    moves_with_capture = self.order_moves(moves_with_capture, board.board)
+
     # by using move ordering and putting moves where the AI captured a piece first, we evaluate the moves
     # that are likely to be the strongest earlier in the search tree, making alpha-beta pruning more efficient.
     all_moves.extend(moves_with_capture)
     all_moves.extend(passive_moves)
     return all_moves
+
+  def order_moves(self, moves, board):
+    def mvv_lva(move):  # https://www.chessprogramming.org/MVV-LVA
+      piece, (targetRow, targetCol) = move
+      return self.get_piece_value(board[targetRow][targetCol]) - self.get_piece_value(piece)
+
+    return sorted(moves, key=mvv_lva, reverse=True)
 
   def draw_AI_calculations(self, game, piece, board):
     """
@@ -254,7 +257,7 @@ class Computer(object):
       rook_piece = move_data.get('rook')  # Retrieve stored rook
       if rook_piece:
         rook_from = move_data['rook_from']
-        
+
         # Ensure the rook moves back to its original position
         board.move(rook_piece, rook_from[0], rook_from[1])
 
