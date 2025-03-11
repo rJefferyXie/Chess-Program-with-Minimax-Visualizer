@@ -14,7 +14,7 @@ A functional chess game implemented in python, with pygame as a supporting modul
 * [Extra Information](#extra)
 
 # Demo Images <a name="demo"></a>
-![demo_blue](https://github.com/rJefferyXie/Chess-Program-with-Minimax-Visualizer/assets/73203729/c92d37e8-9312-44b0-8a25-e0eb247d3185))
+![demo_blue](https://github.com/rJefferyXie/Chess-Program-with-Minimax-Visualizer/assets/73203729/c92d37e8-9312-44b0-8a25-e0eb247d3185)
 ![demo_purple](https://github.com/rJefferyXie/Chess-Program-with-Minimax-Visualizer/assets/73203729/31c1e06b-eca2-4199-ac6d-5a4052545324)
 ![demo_pink](https://github.com/rJefferyXie/Chess-Program-with-Minimax-Visualizer/assets/73203729/2bcc3aed-ad7c-4c24-805a-2939a7b79edf)
 
@@ -113,3 +113,5 @@ The chess AI can hold its own in most situations, but has no grasp of positional
   * To learn more, visit https://www.chessprogramming.org/Alpha-Beta
 
 Chess Assets were downloaded from this free media repository: https://commons.wikimedia.org/wiki/Category:PNG_chess_pieces/Standard_transparent
+
+[Algorithms Explained – minimax and alpha-beta pruning](https://www.youtube.com/watch?v=l-hh51ncgDI)

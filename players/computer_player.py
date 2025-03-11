@@ -3,6 +3,7 @@ from pieces import pawn, knight, bishop, rook, queen, king
 from game.zobrist import ZobristHashing
 from game.profiler import Profiler
 
+
 class Computer(object):
   WHITE = "White"
   BLACK = "Black"
@@ -29,12 +30,12 @@ class Computer(object):
     self.profiler = Profiler()
     self.color = color
     self.transposition_table = {}
-    
+
     # These values provide the user valuable information about the current state of the minimax search
     self.moves_evaluated = 0
     self.total_moves_found = 0
     self.current_best_evaluation = 0
-    
+
     self.zobrist = ZobristHashing(8, 8, [ptype.__name__ for ptype in self.PIECE_TYPES], [self.WHITE, self.BLACK])
 
   def minimax(self, board, game, depth, alpha, beta, max_player):
@@ -51,6 +52,7 @@ class Computer(object):
 
     all_moves = self.get_all_moves(board, game, max_player)
     self.total_moves_found += len(all_moves)
+
     for piece, move in all_moves:
       position = self.simulate_move(piece, board, game, move, max_player)
       self.draw_AI_calculations(game, piece, position)
@@ -68,7 +70,7 @@ class Computer(object):
           best_score = current_score
           best_move = (piece, move)
           beta = min(beta, best_score)
-          
+
       self.current_best_evaluation = best_score
 
       # if beta <= alpha, it means that the maximizing player already has a move with a better outcome than the current branch's best possible outcome
@@ -103,13 +105,12 @@ class Computer(object):
       for piece in row:
         if not piece:
           continue
-        
+
         if piece.color == self.BLACK:
           position_eval -= self.get_piece_value(piece)
         else:
           position_eval += self.get_piece_value(piece)
 
-    self.transposition_table[board_hash] = position_eval
     return position_eval
 
   @Profiler.profile_function
@@ -121,7 +122,6 @@ class Computer(object):
     passive_moves = []
     moves_with_capture = []
 
-    # for each piece that the current player controls, get all valid moves and add them to result
     for piece in board.get_all_pieces(color):
       if isinstance(piece, pawn.Pawn):
         piece.update_valid_moves(board.board, game.move_history.move_log)
@@ -153,12 +153,12 @@ class Computer(object):
   def draw_AI_calculations(self, game, piece, board):
     """
     If the user has enabled the visualize AI feature, show the current position that the AI is considering after every move.
-    """    
+    """
     self.moves_evaluated += 1
 
     if not game.board.show_AI_calculations:
       return
-    
+
     if game.board.AI_speed == "Medium":
       pygame.time.delay(20)
     elif game.board.AI_speed == "Slow":
@@ -194,7 +194,7 @@ class Computer(object):
 
     else:
       # simulating capturing opponents piece
-      if target != 0 and target.color != color:  
+      if target != 0 and target.color != color:
         board.board[move[0]][move[1]] = 0
         board.captured_piece = target
 
@@ -258,7 +258,7 @@ class Computer(object):
   def draw_moves(self, piece, game, board):
     valid_moves = piece.valid_moves
     game.update_screen(valid_moves, board)
-  
+
   def reset_visualizer_stats(self):
     self.moves_evaluated = 0
     self.total_moves_found = 0
