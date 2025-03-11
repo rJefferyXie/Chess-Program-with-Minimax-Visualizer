@@ -164,47 +164,65 @@ class Board(object):
     # Red
     window.blit(images[2], (640, 115))
 
-  def draw_game_buttons(self, window, theme):
-      my_font = pygame.font.SysFont("calibri", 13)
-
+  def draw_game_buttons(self, window, theme, ai):
+      my_font = pygame.font.SysFont("calibri", 12)
+      
       # Resign Button
       new_game = my_font.render("Resign/Quit", True, (0, 0, 0))
-      pygame.draw.rect(window, [0, 0, 0], (483, 328, 74, 39))
-      pygame.draw.rect(window, [255, 255, 255], (485, 330, 70, 35))
-      window.blit(new_game, (488, 340))
+      pygame.draw.rect(window, [0, 0, 0], (483, 198, 74, 39))
+      pygame.draw.rect(window, [255, 255, 255], (485, 200, 70, 35))
+      window.blit(new_game, (488, 210))
 
       # Visualize AI Button
       show_thinking = my_font.render("Visualize AI", True, (0, 0, 0))
-      pygame.draw.rect(window, [0, 0, 0], (563, 328, 74, 39))
+      pygame.draw.rect(window, [0, 0, 0], (563, 198, 74, 39))
       if self.show_AI_calculations:
-          pygame.draw.rect(window, theme[1], (565, 330, 70, 35))
+          pygame.draw.rect(window, theme[1], (565, 200, 70, 35))
       else:
-          pygame.draw.rect(window, [255, 255, 255], (565, 330, 70, 35))
-      window.blit(show_thinking, (570, 340))
+          pygame.draw.rect(window, [255, 255, 255], (565, 200, 70, 35))
+      window.blit(show_thinking, (568, 210))
 
       # Visualize AI Speed Button
       speed = my_font.render(self.AI_speed, True, (0, 0, 0))
-      pygame.draw.rect(window, [0, 0, 0], (563, 373, 74, 39))
+      pygame.draw.rect(window, [0, 0, 0], (563, 243, 74, 39))
       if self.show_AI_calculations:
-          pygame.draw.rect(window, theme[1], (565, 375, 70, 35))
+          pygame.draw.rect(window, theme[1], (565, 245, 70, 35))
       else:
-          pygame.draw.rect(window, [255, 255, 255], (565, 375, 70, 35))
+          pygame.draw.rect(window, [255, 255, 255], (565, 245, 70, 35))
 
       if self.AI_speed == "Medium":
-          window.blit(speed, (579, 386))
+          window.blit(speed, (579, 255))
       else:
-          window.blit(speed, (588, 386))
+          window.blit(speed, (588, 255))
 
       # Highlight Valid Moves
       show_valid_moves1 = my_font.render("Highlight", True, (0, 0, 0))
       show_valid_moves2 = my_font.render("Valid Moves", True, (0, 0, 0))
-      pygame.draw.rect(window, [0, 0, 0], (643, 328, 74, 39))
+      pygame.draw.rect(window, [0, 0, 0], (643, 198, 74, 39))
       if self.show_valid_moves:
-          pygame.draw.rect(window, theme[1], (645, 330, 70, 35))
+          pygame.draw.rect(window, theme[1], (645, 200, 70, 35))
       else:
-          pygame.draw.rect(window, [255, 255, 255], (645, 330, 70, 35))
-      window.blit(show_valid_moves1, (655, 332))
-      window.blit(show_valid_moves2, (648, 350))
+          pygame.draw.rect(window, [255, 255, 255], (645, 200, 70, 35))
+      window.blit(show_valid_moves1, (655, 203))
+      window.blit(show_valid_moves2, (648, 217))
+      
+      if not ai:
+        return
+      
+      pruned_percentage = "N/A"
+      if ai.moves_evaluated and ai.total_moves_found:
+        pruned_percentage = str(round(100 - (ai.moves_evaluated / max(1, ai.total_moves_found)) * 100, 2)) + "%"
+      
+      # Display AI evaluation stats
+      moves_evaluated_text = my_font.render(f"Moves Evaluated: {ai.moves_evaluated}", True, (0, 0, 0))
+      total_moves_found_text = my_font.render(f"Total Moves Found: {ai.total_moves_found}", True, (0, 0, 0))      
+      pruned_percentage_text = my_font.render(f"% of Search Tree Pruned: {pruned_percentage}", True, (0, 0, 0))
+      current_best_evaluation_text = my_font.render(f"Current Best Evaluation: {round(ai.current_best_evaluation / 100, 2)}", True, (0, 0, 0))
+      
+      window.blit(moves_evaluated_text, (500, 310))
+      window.blit(total_moves_found_text, (500, 330))
+      window.blit(pruned_percentage_text, (500, 350))
+      window.blit(current_best_evaluation_text, (500, 370))
 
   def draw_valid_moves(self, moves, window):
     for move in moves:

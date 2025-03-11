@@ -53,13 +53,13 @@ class Human(object):
       self.game.theme = 2
 
     # Clicking on Game Buttons
-    if 485 < mouse_xy[0] < 555 and 330 < mouse_xy[1] < 365:
+    if 485 < mouse_xy[0] < 555 and 200 < mouse_xy[1] < 235:
       self.game.resign = True
 
-    elif 565 < mouse_xy[0] < 635 and 330 < mouse_xy[1] < 365:
+    elif 565 < mouse_xy[0] < 635 and 200 < mouse_xy[1] < 235:
       self.game.board.show_AI_calculations = not self.game.board.show_AI_calculations
 
-    elif 565 < mouse_xy[0] < 635 and 375 < mouse_xy[1] < 410:
+    elif 565 < mouse_xy[0] < 635 and 245 < mouse_xy[1] < 280:
       if self.game.board.AI_speed == "Fast":
         self.game.board.AI_speed = "Medium"
       elif self.game.board.AI_speed == "Medium":
@@ -67,7 +67,7 @@ class Human(object):
       else:
         self.game.board.AI_speed = "Fast"
 
-    elif 645 < mouse_xy[0] < 715 and 330 < mouse_xy[1] < 365:
+    elif 645 < mouse_xy[0] < 715 and 200 < mouse_xy[1] < 235:
       self.game.board.show_valid_moves = not self.game.board.show_valid_moves
 
     return False
@@ -188,6 +188,7 @@ class Human(object):
     if not self.game.detect_promotion(self.selected_piece):
       self.selected_piece = None
 
+    self.game.computer.reset_visualizer_stats()
     self.game.update_screen(self.valid_moves, self.game.board)
 
     return True
