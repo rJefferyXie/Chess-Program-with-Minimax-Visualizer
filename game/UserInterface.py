@@ -70,7 +70,8 @@ class SinglePlayer(object):
     main_menu = tk.Button(self.root, text="Main Menu", command=self.main_menu)
     main_menu.place(x=150, y=20, height=40, width=100)
 
-    difficulties = [("Easy", "Depth: 2"), ("Medium", "Depth: 3"), ("Hard", "Depth: 4"), ("Limit Test", "Depth: 5")]
+    difficulties = [("Easy", "(Depth-2)"), ("Medium", "(Depth-3)"), ("Hard", "(Depth-4)"),
+                    ("Veteran", "(Depth-5)"), ("Expert", "(Depth-6)")]
     difficulty_selection = tk.OptionMenu(self.root, self.difficulty, *difficulties)
     difficulty_selection.place(x=130, y=140, height=32, width=140)
 
@@ -123,10 +124,13 @@ class SinglePlayer(object):
         single_player_game(self.color, 0, 4)
         self.root.destroy()
 
-      elif "Limit Test" in difficulty:
+      elif "Veteran" in difficulty:
         single_player_game(self.color, 0, 5)
         self.root.destroy()
-
+      
+      elif "Expert" in difficulty:
+        single_player_game(self.color, 0, 6)
+        self.root.destroy()   
 
 class Multiplayer(object):
   def __init__(self):
