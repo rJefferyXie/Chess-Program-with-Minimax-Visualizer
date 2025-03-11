@@ -55,9 +55,11 @@ class Human(object):
     # Clicking on Game Buttons
     if 485 < mouse_xy[0] < 555 and 200 < mouse_xy[1] < 235:
       self.game.resign = True
+      self.game.update_screen(self.valid_moves, self.game.board)
 
     elif 565 < mouse_xy[0] < 635 and 200 < mouse_xy[1] < 235:
       self.game.board.show_AI_calculations = not self.game.board.show_AI_calculations
+      self.game.update_screen(self.valid_moves, self.game.board)
 
     elif 565 < mouse_xy[0] < 635 and 245 < mouse_xy[1] < 280:
       if self.game.board.AI_speed == "Fast":
@@ -66,10 +68,13 @@ class Human(object):
         self.game.board.AI_speed = "Slow"
       else:
         self.game.board.AI_speed = "Fast"
+      
+      self.game.update_screen(self.valid_moves, self.game.board)
 
     elif 645 < mouse_xy[0] < 715 and 200 < mouse_xy[1] < 235:
       self.game.board.show_valid_moves = not self.game.board.show_valid_moves
-
+      self.game.update_screen(self.valid_moves, self.game.board)
+      
     return False
 
   def move(self, row, col):
