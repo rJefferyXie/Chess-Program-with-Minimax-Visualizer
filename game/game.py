@@ -49,7 +49,7 @@ class Game(object):
     self.board.draw_theme_window(self.window)
 
     # Draw Game Buttons
-    self.board.draw_game_buttons(self.window, themes[self.theme])
+    self.board.draw_game_buttons(self.window, themes[self.theme], self.computer)
 
     # Draw Move Log
     self.move_history.draw_move_log(self.window)
