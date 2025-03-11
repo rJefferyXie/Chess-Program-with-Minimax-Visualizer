@@ -23,3 +23,12 @@ blue_image = pygame.transform.scale(pygame.image.load("game/themes/blue_theme.pn
 purple_image = pygame.transform.scale(pygame.image.load("game/themes/purple_theme.png"), (square_size, square_size))
 red_image = pygame.transform.scale(pygame.image.load("game/themes/red_theme.png"), (square_size, square_size))
 images = [blue_image, purple_image, red_image]
+
+function_names = [
+    "evaluate_board",
+    "get_piece_value",
+    "get_all_moves",
+    "order_moves",
+    "simulate_move",
+    "undo_move"
+]

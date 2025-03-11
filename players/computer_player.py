@@ -1,46 +1,7 @@
 import pygame
 from pieces import pawn, knight, bishop, rook, queen, king
-import time
-from functools import wraps
 from game.zobrist import ZobristHashing
-
-
-profile_data = {}
-
-
-def profile_function(func):
-  @wraps(func)
-  def wrapper(*args, **kwargs):
-    start_time = time.time()
-    result = func(*args, **kwargs)
-    elapsed_time = time.time() - start_time
-
-    if func.__name__ not in profile_data:
-      profile_data[func.__name__] = {"total_time": 0, "call_count": 0}
-
-    profile_data[func.__name__]["total_time"] += elapsed_time
-    profile_data[func.__name__]["call_count"] += 1
-
-    return result
-
-  return wrapper
-
-
-def print_profile_summary():
-  print("\n------------ Chess Engine Profiling Summary ------------")
-  for func_name, data in profile_data.items():
-    total_time = data["total_time"]
-    call_count = data["call_count"]
-
-    if func_name == "simulate_move":
-      print(f"{func_name}: Simulated {call_count} moves in {total_time:.3f} seconds.")
-    elif func_name == "get_all_moves":
-      print(f"{func_name}: Generated available moves {call_count} times in {total_time:.3f} seconds.")
-    elif func_name == "evaluate_board":
-      print(f"{func_name}: Evaluated the board {call_count} times in {total_time:.3f} seconds.")
-    else:
-      print(f"{func_name}: Executed {call_count} times in {total_time:.3f} seconds.")
-
+from game.profiler import Profiler
 
 class Computer(object):
   WHITE = "White"
@@ -65,6 +26,7 @@ class Computer(object):
   }
 
   def __init__(self, color):
+    self.profiler = Profiler()
     self.color = color
     self.transposition_table = {}
     
@@ -117,6 +79,7 @@ class Computer(object):
 
     return best_score, best_move
 
+  @Profiler.profile_function
   def get_piece_value(self, piece):
     """
     Calculate the value of a piece using material and positional evaluation.
@@ -125,7 +88,7 @@ class Computer(object):
     piece_material, piece_eval_table = self.PIECE_EVALUATION_TABLES[piece_key]
     return piece_material + piece_eval_table[piece.row][piece.col]
 
-  @profile_function
+  @Profiler.profile_function
   def evaluate_board(self, board):
     """
     Evaluate the board state, considering material and positional advantages.
@@ -147,7 +110,7 @@ class Computer(object):
     self.transposition_table[board_hash] = position_eval
     return position_eval
 
-  @profile_function
+  @Profiler.profile_function
   def get_all_moves(self, board, game, color):
     """
     Generates all possible moves for each piece that the player owns.
@@ -177,6 +140,7 @@ class Computer(object):
     all_moves.extend(passive_moves)
     return all_moves
 
+  @Profiler.profile_function
   def order_moves(self, moves, board):
     def mvv_lva(move):  # https://www.chessprogramming.org/MVV-LVA
       piece, (targetRow, targetCol) = move
@@ -200,7 +164,7 @@ class Computer(object):
 
     self.draw_moves(piece, game, board)
 
-  @profile_function
+  @Profiler.profile_function
   def simulate_move(self, piece, board, game, move, color):
     """
     Simulates a move on a copy of the board.
@@ -251,6 +215,7 @@ class Computer(object):
 
     return board
 
+  @Profiler.profile_function
   def undo_move(self, board, game):
     # Restore previous move data
     move_data = board.stored_moves.pop()
@@ -327,5 +292,5 @@ class Computer(object):
     game.update_game()
     game.check_game_status()
 
-    print_profile_summary()
-    profile_data.clear()
+    self.profiler.print_profile_summary()
+    self.profiler.reset_profiler()
