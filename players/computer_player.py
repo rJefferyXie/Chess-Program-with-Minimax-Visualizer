@@ -101,11 +101,13 @@ class Computer(object):
     position_eval = 0
     for row in board.board:
       for piece in row:
-        if isinstance(piece, self.PIECE_TYPES):
-          if piece.color == self.BLACK:
-            position_eval -= self.get_piece_value(piece)
-          else:
-            position_eval += self.get_piece_value(piece)
+        if not piece:
+          continue
+        
+        if piece.color == self.BLACK:
+          position_eval -= self.get_piece_value(piece)
+        else:
+          position_eval += self.get_piece_value(piece)
 
     self.transposition_table[board_hash] = position_eval
     return position_eval
@@ -167,7 +169,7 @@ class Computer(object):
   @Profiler.profile_function
   def simulate_move(self, piece, board, game, move, color):
     """
-    Simulates a move on a copy of the board.
+    Simulates a move on the board.
     """
     target = board.get_piece(move[0], move[1])
 
