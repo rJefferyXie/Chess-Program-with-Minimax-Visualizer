@@ -38,8 +38,6 @@ def print_profile_summary():
       print(f"{func_name}: Generated {call_count} moves in {total_time:.3f} seconds.")
     elif func_name == "evaluate_board":
       print(f"{func_name}: Evaluated the board {call_count} times in {total_time:.3f} seconds.")
-    elif func_name == "minimax":
-      print(f"{func_name}: Completed {call_count} recursive calls in {total_time:.3f} seconds.")
     else:
       print(f"{func_name}: Executed {call_count} times in {total_time:.3f} seconds.")
 
@@ -69,9 +67,14 @@ class Computer(object):
   def __init__(self, color):
     self.color = color
     self.transposition_table = {}
+    
+    # These values provide the user valuable information about the current state of the minimax search
+    self.moves_evaluated = 0
+    self.total_moves_found = 0
+    self.current_best_evaluation = 0
+    
     self.zobrist = ZobristHashing(8, 8, [ptype.__name__ for ptype in self.PIECE_TYPES], [self.WHITE, self.BLACK])
 
-  @profile_function
   def minimax(self, board, game, depth, alpha, beta, max_player):
     """
     Implements the Minimax algorithm to calculate the move that would maximize the AI's positional evaluation.
@@ -85,6 +88,7 @@ class Computer(object):
     other_player = self.BLACK if max_player == self.WHITE else self.WHITE
 
     all_moves = self.get_all_moves(board, game, max_player)
+    self.total_moves_found += len(all_moves)
     for piece, move in all_moves:
       position = self.simulate_move(piece, board, game, move, max_player)
       self.draw_AI_calculations(game, piece, position)
@@ -102,6 +106,8 @@ class Computer(object):
           best_score = current_score
           best_move = (piece, move)
           beta = min(beta, best_score)
+          
+      self.current_best_evaluation = best_score
 
       # if beta <= alpha, it means that the maximizing player already has a move with a better outcome than the current branch's best possible outcome
       # this means that we can can prune this branch to reduce unneccessary computations since we know that the maximizing player will never choose this branch
@@ -181,7 +187,9 @@ class Computer(object):
   def draw_AI_calculations(self, game, piece, board):
     """
     If the user has enabled the visualize AI feature, show the current position that the AI is considering after every move.
-    """
+    """    
+    self.moves_evaluated += 1
+
     if not game.board.show_AI_calculations:
       return
     
@@ -283,6 +291,11 @@ class Computer(object):
   def draw_moves(self, piece, game, board):
     valid_moves = piece.valid_moves
     game.update_screen(valid_moves, board)
+  
+  def reset_visualizer_stats(self):
+    self.moves_evaluated = 0
+    self.total_moves_found = 0
+    self.current_best_evaluation = 0
 
   def computer_move(self, game, move):
     board = self.simulate_move(move[0], game.board, game, move[1], self.color)
