@@ -3,6 +3,7 @@ from PIL import Image, ImageTk
 import pygame
 from game.constants import width, height, square_size, themes
 from game.game import Game
+import threading
 
 
 def position_window(root):
@@ -127,10 +128,11 @@ class SinglePlayer(object):
       elif "Veteran" in difficulty:
         single_player_game(self.color, 0, 5)
         self.root.destroy()
-      
+
       elif "Expert" in difficulty:
         single_player_game(self.color, 0, 6)
-        self.root.destroy()   
+        self.root.destroy()
+
 
 class Multiplayer(object):
   def __init__(self):
@@ -214,9 +216,19 @@ def single_player_game(color, theme, depth):
   fps = 60
   clock = pygame.time.Clock()
   running = True
+  ai_thinking = False
+  
+  # Function to handle AI move generation in a separate thread
+  def multithread_minimax():
+    nonlocal ai_thinking  # Access the ai_thinking flag
+    _, move = chess_game.computer.minimax(chess_game.board, chess_game, depth,
+                                          float("-inf"), float("inf"), chess_game.computer.color)
+    chess_game.computer.computer_move(chess_game, move)
+    ai_thinking = False  # Reset the flag once AI has made its move
+          
   while running:
     clock.tick(fps)
-    for event in pygame.event.get():
+    for event in pygame.event.get():      
       if event.type == pygame.QUIT:
         running = False
 
@@ -232,15 +244,17 @@ def single_player_game(color, theme, depth):
           elif 4 <= row <= 5 and 3 <= col <= 4:
             running = False
         else:
-          # if chess_game.turn == chess_game.human.color or chess_game.human.promoting:
-          chess_game.human.select(row, col, mouse_xy)
+          chess_game.human.select(row, col, mouse_xy, ai_thinking)
 
-    if chess_game.turn == chess_game.computer.color \
-            and not chess_game.human.promoting and not chess_game.game_over():
-      _, move = chess_game.computer.minimax(chess_game.board, chess_game, depth,
-                                            float("-inf"), float("inf"), chess_game.computer.color)
-      chess_game.computer.computer_move(chess_game, move)
+    if chess_game.turn == chess_game.computer.color and not chess_game.human.promoting and not chess_game.game_over():
+      if not ai_thinking: 
+        ai_thinking = True
+        threading.Thread(target=multithread_minimax).start()
 
+    # If AI is thinking, freeze the screen
+    if ai_thinking:
+      continue
+    
     if chess_game.game_over():
       draw_end_screen(chess_game, game_window)
     else:

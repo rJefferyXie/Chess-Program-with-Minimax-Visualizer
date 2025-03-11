@@ -14,8 +14,8 @@ class Human(object):
     self.promoting = False
     self.valid_moves = []
 
-  def select(self, row, col, mouse_xy):
-    if row < 8 and col < 8 and not self.promoting:
+  def select(self, row, col, mouse_xy, ai_thinking=False):
+    if row < 8 and col < 8 and not self.promoting and not ai_thinking:
       if self.selected_piece:
         result = self.move(row, col)
         if not result:
@@ -29,7 +29,7 @@ class Human(object):
         self.valid_moves = piece.valid_moves
         return True
 
-    if self.promoting:
+    if self.promoting and not ai_thinking:
       if (row, col) == (9, 3):
         self.promote(Queen, self.selected_piece.row, self.selected_piece.col)
 
