@@ -35,7 +35,7 @@ def print_profile_summary():
     if func_name == "simulate_move":
       print(f"{func_name}: Simulated {call_count} moves in {total_time:.3f} seconds.")
     elif func_name == "get_all_moves":
-      print(f"{func_name}: Generated {call_count} moves in {total_time:.3f} seconds.")
+      print(f"{func_name}: Generated available moves {call_count} times in {total_time:.3f} seconds.")
     elif func_name == "evaluate_board":
       print(f"{func_name}: Evaluated the board {call_count} times in {total_time:.3f} seconds.")
     else:
