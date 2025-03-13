@@ -30,6 +30,7 @@ class Computer(object):
     self.profiler = Profiler()
     self.color = color
     self.transposition_table = {}
+    self.piece_value_cache = {}
 
     # These values provide the user valuable information about the current state of the minimax search
     self.moves_evaluated = 0
@@ -86,9 +87,17 @@ class Computer(object):
     """
     Calculate the value of a piece using material and positional evaluation.
     """
-    piece_key = (piece.color, type(piece).__name__)
-    piece_material, piece_eval_table = self.PIECE_EVALUATION_TABLES[piece_key]
-    return piece_material + piece_eval_table[piece.row][piece.col]
+    piece_key = (piece.color, piece.type, piece.row, piece.col)
+    if piece_key in self.piece_value_cache:
+      return self.piece_value_cache[piece_key]
+
+    piece_material, piece_eval_table = self.PIECE_EVALUATION_TABLES[(piece_key[0], piece_key[1])]
+    piece_index = (piece.row * 8) + piece.col
+    piece_value = piece_material + piece_eval_table[piece_index]
+
+    # cache this for future
+    self.piece_value_cache[piece_key] = piece_value
+    return piece_value
 
   @Profiler.profile_function
   def evaluate_board(self, board):
@@ -106,10 +115,14 @@ class Computer(object):
         if not piece:
           continue
 
+        piece_key = (piece.color, piece.type, piece.row, piece.col)
+        if piece_key not in self.piece_value_cache:
+          self.piece_value_cache[piece_key] = self.get_piece_value(piece)
+
         if piece.color == self.BLACK:
-          position_eval -= self.get_piece_value(piece)
+          position_eval -= self.piece_value_cache[piece_key]
         else:
-          position_eval += self.get_piece_value(piece)
+          position_eval += self.piece_value_cache[piece_key]
 
     return position_eval
 
@@ -146,7 +159,12 @@ class Computer(object):
   def order_moves(self, moves, board):
     def mvv_lva(move):  # https://www.chessprogramming.org/MVV-LVA
       piece, (targetRow, targetCol) = move
-      return self.get_piece_value(board[targetRow][targetCol]) - self.get_piece_value(piece)
+
+      piece_key = (piece.color, piece.type, piece.row, piece.col)
+      if piece_key not in self.piece_value_cache:
+        self.piece_value_cache[piece_key] = self.get_piece_value(piece)
+
+      return self.get_piece_value(board[targetRow][targetCol]) - self.piece_value_cache[piece_key]
 
     return sorted(moves, key=mvv_lva, reverse=True)
 
@@ -294,5 +312,5 @@ class Computer(object):
     game.update_game()
     game.check_game_status()
 
-    self.profiler.print_profile_summary()
+    self.profiler.print_profile_summary(self.moves_evaluated)
     self.profiler.reset_profiler()
