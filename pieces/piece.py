@@ -5,6 +5,7 @@ class Piece(object):
   def __init__(self, row, col, color):
     self.row = row
     self.col = col
+    self.type = self.__class__.__name__
     self.color = color
     self.selected = False
     self.valid_moves = []
