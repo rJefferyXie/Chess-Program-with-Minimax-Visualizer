@@ -26,7 +26,6 @@ images = [blue_image, purple_image, red_image]
 
 function_names = [
     "evaluate_board",
-    "get_piece_value",
     "get_all_moves",
     "order_moves",
     "simulate_move",

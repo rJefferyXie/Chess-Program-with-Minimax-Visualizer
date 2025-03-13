@@ -82,7 +82,6 @@ class Computer(object):
 
     return best_score, best_move
 
-  @Profiler.profile_function
   def get_piece_value(self, piece):
     """
     Calculate the value of a piece using material and positional evaluation.
@@ -95,7 +94,7 @@ class Computer(object):
     piece_index = (piece.row * 8) + piece.col
     piece_value = piece_material + piece_eval_table[piece_index]
 
-    # cache this for future
+    # cache this for future lookups
     self.piece_value_cache[piece_key] = piece_value
     return piece_value
 
@@ -105,7 +104,7 @@ class Computer(object):
     Evaluate the board state, considering material and positional advantages.
     """
     # use the cached result if this board state has already been evaluated before
-    board_hash = self.zobrist.calculate_hash(board)
+    board_hash = board.hash or self.zobrist.calculate_hash(board)
     if board_hash in self.transposition_table:
       return self.transposition_table[board_hash]
 
@@ -163,8 +162,13 @@ class Computer(object):
       piece_key = (piece.color, piece.type, piece.row, piece.col)
       if piece_key not in self.piece_value_cache:
         self.piece_value_cache[piece_key] = self.get_piece_value(piece)
+      
+      target = board[targetRow][targetCol]
+      target_key = (target.color, target.type, target.row, target.col)
+      if target_key not in self.piece_value_cache:
+        self.piece_value_cache[target_key] = self.get_piece_value(target)
 
-      return self.get_piece_value(board[targetRow][targetCol]) - self.piece_value_cache[piece_key]
+      return self.piece_value_cache[target_key] - self.piece_value_cache[piece_key]
 
     return sorted(moves, key=mvv_lva, reverse=True)
 
@@ -221,6 +225,7 @@ class Computer(object):
       if game.detect_promotion(piece):
         # for simplicity, the computer will always promote to a queen
         board.board[piece.row][piece.col] = queen.Queen(piece.row, piece.col, piece.color)
+        board.stored_moves[-1]['promoted'] = True
 
     # after a rook or king moves, it can no longer castle
     if isinstance(piece, (rook.Rook, king.King)):
@@ -263,7 +268,7 @@ class Computer(object):
       board.captured_piece = 0
 
     # Undo any pawn promotion
-    if isinstance(piece, queen.Queen) and game.detect_promotion(piece):
+    if isinstance(piece, queen.Queen) and move_data.get('promoted'):
       board.board[from_square[0]][from_square[1]] = pawn.Pawn(from_square[0], from_square[1], piece.color)
 
     # Restore the castling ability for rook or king if it was altered
