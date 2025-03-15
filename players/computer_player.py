@@ -1,6 +1,5 @@
 import pygame
 from pieces import pawn, knight, bishop, rook, queen, king
-from game.zobrist import ZobristHashing
 from game.profiler import Profiler
 
 
@@ -36,8 +35,6 @@ class Computer(object):
     self.moves_evaluated = 0
     self.total_moves_found = 0
     self.current_best_evaluation = 0
-
-    self.zobrist = ZobristHashing(8, 8, [ptype.__name__ for ptype in self.PIECE_TYPES], [self.WHITE, self.BLACK])
 
   def minimax(self, board, game, depth, alpha, beta, max_player):
     """
@@ -103,11 +100,6 @@ class Computer(object):
     """
     Evaluate the board state, considering material and positional advantages.
     """
-    # use the cached result if this board state has already been evaluated before
-    board_hash = board.hash or self.zobrist.calculate_hash(board)
-    if board_hash in self.transposition_table:
-      return self.transposition_table[board_hash]
-
     position_eval = 0
     for row in board.board:
       for piece in row:
@@ -231,13 +223,6 @@ class Computer(object):
     if isinstance(piece, (rook.Rook, king.King)):
       piece.can_castle = False
 
-    # Initialize the hash if not already set
-    if not board.hash:
-      board.hash = self.zobrist.calculate_hash(board)
-
-    # Update the Zobrist hash
-    board.hash = self.zobrist.update_hash(board.hash, piece, board.prev_square, board.target)
-
     return board
 
   @Profiler.profile_function
@@ -274,9 +259,6 @@ class Computer(object):
     # Restore the castling ability for rook or king if it was altered
     if isinstance(piece, (king.King, rook.Rook)) and can_castle is not None:
       piece.can_castle = can_castle
-
-    # Revert Zobrist hash
-    board.hash = self.zobrist.update_hash(board.hash, piece, to_square, from_square)
 
   def draw_moves(self, piece, game, board):
     valid_moves = piece.valid_moves
